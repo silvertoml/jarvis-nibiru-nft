@@ -170,6 +170,12 @@ pub enum QueryMsg<Q: JsonSchema> {
 
     #[returns(Option<String>)]
     GetWithdrawAddress {},
+
+    // GetStates {},
+    #[returns(Option<String>)]
+    GetName {},
+    // GetTicker {},
+    // GetMintPerTx {}
 }
 
 /// Shows who can mint these tokens

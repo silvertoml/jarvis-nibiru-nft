@@ -328,6 +328,9 @@ where
             QueryMsg::Extension { msg: _ } => Ok(Binary::default()),
             QueryMsg::GetWithdrawAddress {} => {
                 to_json_binary(&self.withdraw_address.may_load(deps.storage)?)
+            },
+            QueryMsg::GetName {  } => {
+                to_json_binary(&self.contract_info.may_load(deps.storage)?)
             }
         }
     }
@@ -360,7 +363,7 @@ fn humanize_approvals<T>(
     info.approvals
         .iter()
         .filter(|apr| include_expired || !apr.is_expired(block))
-        .map(humanize_approval)
+        .map(humanize_approval)/*  */
         .collect()
 }
 

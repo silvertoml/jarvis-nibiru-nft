@@ -21,6 +21,14 @@ where
     pub tokens: IndexedMap<'a, &'a str, TokenInfo<T>, TokenIndexes<'a, T>>,
     pub withdraw_address: Item<'a, String>,
 
+    pub reserved_amount: Item<'a, u64>,
+    pub mint_per_tx: Item<'a, u64>,
+    pub mint_price: Item<'a, u64>,
+    pub mint_fee: Item<'a, u64>,
+    pub suply_limit: Item<'a, u64>,
+    pub dev_wallet: Item<'a, String>,
+    pub sale_time: Item<'a, u64>,
+
     pub(crate) _custom_response: PhantomData<C>,
     pub(crate) _custom_query: PhantomData<Q>,
     pub(crate) _custom_execute: PhantomData<E>,
@@ -48,8 +56,15 @@ where
             "num_tokens",
             "operators",
             "tokens",
-            "tokens__owner",
+            "tokens_owner",
             "withdraw_address",
+            "reserved_amount",
+            "mint_per_tx",
+            "mint_price",
+            "mint_fee",
+            "suply_limit",
+            "dev_wallet",
+            "sale_time",
         )
     }
 }
@@ -67,6 +82,15 @@ where
         tokens_key: &'a str,
         tokens_owner_key: &'a str,
         withdraw_address_key: &'a str,
+
+        reserved_amount:&'a str,
+        mint_per_tx:&'a str,
+        mint_price:&'a str,
+        mint_fee:&'a str,
+        suply_limit:&'a str,
+        dev_wallet:&'a str,
+        sale_time:&'a str,
+
     ) -> Self {
         let indexes = TokenIndexes {
             owner: MultiIndex::new(token_owner_idx, tokens_key, tokens_owner_key),
@@ -77,6 +101,15 @@ where
             operators: Map::new(operator_key),
             tokens: IndexedMap::new(tokens_key, indexes),
             withdraw_address: Item::new(withdraw_address_key),
+
+            reserved_amount: Item::new(reserved_amount),
+            mint_per_tx: Item::new(mint_per_tx),
+            mint_price: Item::new(mint_price),
+            mint_fee: Item::new(mint_fee),
+            suply_limit: Item::new(suply_limit),
+            dev_wallet: Item::new(dev_wallet),
+            sale_time: Item::new(sale_time),
+
             _custom_response: PhantomData,
             _custom_execute: PhantomData,
             _custom_query: PhantomData,
