@@ -330,7 +330,33 @@ where
                 to_json_binary(&self.withdraw_address.may_load(deps.storage)?)
             },
             QueryMsg::GetName {  } => {
-                to_json_binary(&self.contract_info.may_load(deps.storage)?)
+                let contract_info = self.contract_info.load(deps.storage)?;
+                to_json_binary(&contract_info.name)
+            },
+            QueryMsg::GetSymbol {  } => {
+                let contract_info = self.contract_info.load(deps.storage)?;
+                to_json_binary(&contract_info.symbol)
+            },
+            QueryMsg::GetMintPerTx {  } => {
+                to_json_binary(&self.mint_per_tx.may_load(deps.storage)?)
+            },
+            QueryMsg::GetMintPrice {  } => {
+                to_json_binary(&self.mint_price.may_load(deps.storage)?)
+            },
+            QueryMsg::GetMintFee {  } => {
+                to_json_binary(&self.mint_fee.may_load(deps.storage)?)
+            },
+            QueryMsg::GetSupplyLimit {  } => {
+                to_json_binary(&self.suply_limit.may_load(deps.storage)?)
+            },
+            QueryMsg::GetTotalSupply {  } => {
+                to_json_binary(&self.total_supply.may_load(deps.storage)?)
+            },
+            QueryMsg::GetSaleTime {  } => {
+                to_json_binary(&self.sale_time.may_load(deps.storage)?)
+            },
+            QueryMsg::GetOwner {  } => {
+                to_json_binary(&self.owner.may_load(deps.storage)?)
             }
         }
     }

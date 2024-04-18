@@ -79,6 +79,28 @@ pub enum ExecuteMsg<T, E> {
     /// Withdraw from the contract to the given address. Anyone can call this,
     /// which is okay since withdraw address has been set by owner.
     WithdrawFunds { amount: Coin },
+
+    SetOwner { owner: String },
+
+    SetName { name: String },
+
+    SetSymbol { symbol: String },
+    
+    SetMintPerTx { tx: u64 },
+    
+    SetMintPrice { price: u64 },
+    
+    SetMintFee { fee: u64 },
+    
+    SetDevFee { fee: u64 },
+    
+    SetSupplyLimit { supply_limit: u64 },
+    
+    SetSaleTime { sale_time: u64 },
+
+    Buy { qty: u64 }
+
+
 }
 
 #[cw_ownable_query]
@@ -172,10 +194,33 @@ pub enum QueryMsg<Q: JsonSchema> {
     GetWithdrawAddress {},
 
     // GetStates {},
-    #[returns(Option<String>)]
+    #[returns(String)]
     GetName {},
-    // GetTicker {},
-    // GetMintPerTx {}
+
+    #[returns(String)]
+    GetSymbol {},
+
+    #[returns(u64)]
+    GetMintPerTx {},
+
+    #[returns(u64)]
+    GetMintPrice {},
+
+    #[returns(u64)]
+    GetMintFee {},
+
+    #[returns(u64)]
+    GetSupplyLimit {},
+
+    #[returns(u64)]
+    GetTotalSupply {},
+
+    #[returns(u64)]
+    GetSaleTime {},
+
+    #[returns(String)]
+    GetOwner {}
+
 }
 
 /// Shows who can mint these tokens

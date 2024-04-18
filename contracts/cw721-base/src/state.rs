@@ -16,6 +16,8 @@ where
 {
     pub contract_info: Item<'a, ContractInfoResponse>,
     pub token_count: Item<'a, u64>,
+    pub owner: Item<'a, String>,
+
     /// Stored as (granter, operator) giving operator full control over granter's account
     pub operators: Map<'a, (&'a Addr, &'a Addr), Expiration>,
     pub tokens: IndexedMap<'a, &'a str, TokenInfo<T>, TokenIndexes<'a, T>>,
@@ -25,7 +27,9 @@ where
     pub mint_per_tx: Item<'a, u64>,
     pub mint_price: Item<'a, u64>,
     pub mint_fee: Item<'a, u64>,
+    pub dev_fee: Item<'a, u64>,
     pub suply_limit: Item<'a, u64>,
+    pub total_supply: Item<'a, u64>,
     pub dev_wallet: Item<'a, String>,
     pub sale_time: Item<'a, u64>,
 
@@ -53,6 +57,7 @@ where
     fn default() -> Self {
         Self::new(
             "nft_info",
+            "ownner_info",
             "num_tokens",
             "operators",
             "tokens",
@@ -62,7 +67,9 @@ where
             "mint_per_tx",
             "mint_price",
             "mint_fee",
+            "dev_fee",
             "suply_limit",
+            "total supply",
             "dev_wallet",
             "sale_time",
         )
@@ -77,6 +84,7 @@ where
 {
     fn new(
         contract_key: &'a str,
+        owner_key: &'a str,
         token_count_key: &'a str,
         operator_key: &'a str,
         tokens_key: &'a str,
@@ -87,7 +95,9 @@ where
         mint_per_tx:&'a str,
         mint_price:&'a str,
         mint_fee:&'a str,
+        dev_fee:&'a str,
         suply_limit:&'a str,
+        total_supply:&'a str,
         dev_wallet:&'a str,
         sale_time:&'a str,
 
@@ -97,6 +107,7 @@ where
         };
         Self {
             contract_info: Item::new(contract_key),
+            owner: Item::new(owner_key),
             token_count: Item::new(token_count_key),
             operators: Map::new(operator_key),
             tokens: IndexedMap::new(tokens_key, indexes),
@@ -106,7 +117,9 @@ where
             mint_per_tx: Item::new(mint_per_tx),
             mint_price: Item::new(mint_price),
             mint_fee: Item::new(mint_fee),
+            dev_fee: Item::new(dev_fee),
             suply_limit: Item::new(suply_limit),
+            total_supply: Item::new(total_supply),
             dev_wallet: Item::new(dev_wallet),
             sale_time: Item::new(sale_time),
 
