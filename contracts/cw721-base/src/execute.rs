@@ -3,7 +3,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 use cosmwasm_std::{
-    Addr, BankMsg, Binary, Coin, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response, Storage,
+    Addr, BankMsg, Binary, Coin, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response, Storage, SubMsg, Empty, coin
 };
 
 use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
@@ -11,6 +11,7 @@ use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg};
 use crate::state::{Approval, Cw721Contract, TokenInfo};
+use std::cmp;
 
 impl<'a, T, C, E, Q> Cw721Contract<'a, T, C, E, Q>
 where
@@ -53,12 +54,12 @@ where
         msg: ExecuteMsg<T, E>,
     ) -> Result<Response<C>, ContractError> {
         match msg {
-            ExecuteMsg::Mint {
-                token_id,
-                owner,
-                token_uri,
-                extension,
-            } => self.mint(deps, info, token_id, owner, token_uri, extension),
+            // ExecuteMsg::Mint {
+            //     token_id,
+            //     owner,
+            //     token_uri,
+            //     extension,
+            // } => self.mint(deps, info, token_id, owner, token_uri, extension),
             ExecuteMsg::Approve {
                 spender,
                 token_id,
@@ -90,6 +91,16 @@ where
                 self.remove_withdraw_address(deps.storage, &info.sender)
             }
             ExecuteMsg::WithdrawFunds { amount } => self.withdraw_funds(deps.storage, &amount),
+            ExecuteMsg::SetOwner { owner } => self.set_owner(deps.storage, &info.sender, &owner),
+            ExecuteMsg::SetName { name } => self.set_name(deps.storage, &info.sender, &name),
+            ExecuteMsg::SetSymbol { symbol } => self.set_symbol(deps.storage, &info.sender, &symbol),
+            ExecuteMsg::SetMintPerTx { tx } => self.set_mint_per_tx(deps, &info.sender, &tx),
+            ExecuteMsg::SetMintFee { fee } => self.set_mint_fee(deps, &info.sender, &fee),
+            ExecuteMsg::SetDevFee { fee } => self.set_dev_fee(deps, &info.sender, &fee),
+            ExecuteMsg::SetSupplyLimit { supply_limit } => self.set_supply_limit(deps, &info.sender, &supply_limit),
+            ExecuteMsg::SetSaleTime { sale_time } => self.set_sale_time(deps, &info.sender, &sale_time),
+            ExecuteMsg::Buy { qty , extension} => self.buy(deps, info, &qty, extension),
+            ExecuteMsg::ToggleSaleActive {  } => self.toggle_sale_active(deps, &info.sender),
         }
     }
 }
@@ -107,31 +118,34 @@ where
         deps: DepsMut,
         info: MessageInfo,
         token_id: String,
-        owner: String,
-        token_uri: Option<String>,
+        qty: u64,
         extension: T,
     ) -> Result<Response<C>, ContractError> {
-        cw_ownable::assert_owner(deps.storage, &info.sender)?;
-
+        cw_ownable::assert_owner(deps.storage, &info.clone().sender)?;
+        let mut total_supply = self.total_supply.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
         // create the token
-        let token = TokenInfo {
-            owner: deps.api.addr_validate(&owner)?,
-            approvals: vec![],
-            token_uri,
-            extension,
-        };
-        self.tokens
+        for i in 0..qty.clone() {
+            let token = TokenInfo {
+                owner: info.clone().sender,
+                approvals: vec![],
+                token_uri: Some(format!("https://ipfs.io/ipfs/bafybeigrytqzipxv4sekrofqfz4etp4f6c7a3bssi5oyerccmeksm4czku/{}", total_supply.clone() + i + 1)),
+                extension: extension.clone(),
+            };
+            self.tokens
             .update(deps.storage, &token_id, |old| match old {
                 Some(_) => Err(ContractError::Claimed {}),
                 None => Ok(token),
             })?;
-
-        self.increment_tokens(deps.storage)?;
+            
+            self.increment_tokens(deps.storage)?;
+        }
+        total_supply += qty.clone();
+        self.total_supply.save(deps.storage, &total_supply)?;
 
         Ok(Response::new()
             .add_attribute("action", "mint")
-            .add_attribute("minter", info.sender)
-            .add_attribute("owner", owner)
+            .add_attribute("minter", info.clone().sender)
+            .add_attribute("owner", info.clone().sender)
             .add_attribute("token_id", token_id))
     }
 
@@ -197,6 +211,202 @@ where
             }
             None => Err(ContractError::NoWithdrawAddress {}),
         }
+    }
+
+    pub fn set_owner(
+        &self,
+        storage: &mut dyn Storage,
+        sender: &Addr,
+        owner: &String,
+    ) -> Result<Response<C>, ContractError> {
+        // self.contract_info.save(deps.storage, &contract_info)?;
+        // self
+        cw_ownable::assert_owner(storage, sender)?;
+        self.owner.save(storage, &owner)?;
+        Ok(Response::new()
+            .add_attribute("action", "set_owner")
+            .add_attribute("owner", owner))
+    }
+
+    pub fn set_name(
+        &self,
+        storage: &mut dyn Storage,
+        sender: &Addr,
+        name: &String,
+    ) -> Result<Response<C>, ContractError> {
+        // self.contract_info.save(deps.storage, &contract_info)?;
+        // self
+        cw_ownable::assert_owner(storage, sender)?;
+        let old_contract_info = self.contract_info.may_load(storage)?;
+        let old_name = old_contract_info.unwrap_or_else(|| ContractInfoResponse{
+            name: "None".to_string(),
+            symbol: "None".to_string()
+        });
+
+        let new_contract_info = ContractInfoResponse{
+            symbol: old_name.symbol,
+            name: name.to_string(),
+        };
+        
+        self.contract_info.save(storage, &new_contract_info)?;
+        Ok(Response::new()
+            .add_attribute("action", "set_name")
+            .add_attribute("name", name))
+    }
+
+    pub fn set_symbol(
+        &self,
+        storage: &mut dyn Storage,
+        sender: &Addr,
+        symbol: &String,
+    ) -> Result<Response<C>, ContractError> {
+        // self.contract_info.save(deps.storage, &contract_info)?;
+        // self
+        cw_ownable::assert_owner(storage, sender)?;
+        let old_contract_info = self.contract_info.may_load(storage)?;
+        let old_name = old_contract_info.unwrap_or_else(|| ContractInfoResponse{
+            name: "None".to_string(),
+            symbol: "None".to_string()
+        });
+
+        let new_contract_info = ContractInfoResponse{
+            symbol: symbol.to_string(),
+            name: old_name.name,
+        };
+        
+        self.contract_info.save(storage, &new_contract_info)?;
+        Ok(Response::new()
+            .add_attribute("action", "set_symbol")
+            .add_attribute("symbol", symbol))
+    }
+
+    pub fn set_mint_per_tx(
+        &self,
+        deps: DepsMut,
+        sender: &Addr,
+        tx: &u64,
+    ) -> Result<Response<C>, ContractError> {
+        cw_ownable::assert_owner(deps.storage, sender)?;
+        
+        self.mint_per_tx.save(deps.storage, &tx)?;
+        Ok(Response::new()
+            .add_attribute("action", "set_mint_per_tx")
+            .add_attribute("mint_per_tx", tx.to_string()))
+    }
+
+    pub fn set_mint_fee(
+        &self,
+        deps: DepsMut,
+        sender: &Addr,
+        fee: &u64,
+    ) -> Result<Response<C>, ContractError> {
+        cw_ownable::assert_owner(deps.storage, sender)?;
+        
+        self.mint_fee.save(deps.storage, &fee)?;
+        Ok(Response::new()
+            .add_attribute("action", "set_mint_fee")
+            .add_attribute("mint_fee", fee.to_string()))
+    }
+
+    pub fn set_dev_fee(
+        &self,
+        deps: DepsMut,
+        sender: &Addr,
+        fee: &u64,
+    ) -> Result<Response<C>, ContractError> {
+        cw_ownable::assert_owner(deps.storage, sender)?;
+        
+        self.dev_fee.save(deps.storage, &fee)?;
+        Ok(Response::new()
+            .add_attribute("action", "set_dev_fee")
+            .add_attribute("dev_fee", fee.to_string()))
+    }
+
+    pub fn set_supply_limit(
+        &self,
+        deps: DepsMut,
+        sender: &Addr,
+        supply_limit: &u64,
+    ) -> Result<Response<C>, ContractError> {
+        cw_ownable::assert_owner(deps.storage, sender)?;
+        
+        self.suply_limit.save(deps.storage, &supply_limit)?;
+        Ok(Response::new()
+            .add_attribute("action", "set_supply_limit")
+            .add_attribute("supply_limit", supply_limit.to_string()))
+    }
+
+    pub fn set_sale_time(
+        &self,
+        deps: DepsMut,
+        sender: &Addr,
+        sale_time: &u64,
+    ) -> Result<Response<C>, ContractError> {
+        cw_ownable::assert_owner(deps.storage, sender)?;
+        
+        self.sale_time.save(deps.storage, &sale_time)?;
+        Ok(Response::new()
+            .add_attribute("action", "set_sale_time")
+            .add_attribute("sale_time", sale_time.to_string()))
+    }
+
+    pub fn buy(
+        &self,
+        deps: DepsMut,
+        info: MessageInfo,
+        qty: &u64,
+        extension: T
+    ) -> Result<Response<C>, ContractError> {
+        let sale_active = self.sale_active.may_load(deps.storage)?;
+        if sale_active.unwrap_or_else(|| false) == false {
+            return Err(ContractError::SaleUnactivate {});
+        }
+
+        let sent_funds: u128 = info.funds.iter().find(|coin| coin.denom == "unibi").map_or(0u128, |coin| coin.amount.u128());
+        let mint_fee = self.mint_fee.may_load(deps.storage)?;
+        let dev_fee = self.dev_fee.may_load(deps.storage)?;
+        let mint_per_tx = self.mint_per_tx.may_load(deps.storage)?;
+        let total_fee = mint_fee.unwrap_or_else(|| 0) + dev_fee.unwrap_or_else(|| 0);
+
+        if sent_funds.clone() < qty.clone() as u128 * total_fee.clone() as u128 {
+            return Err(ContractError::IncorrectFunds {});
+        }
+
+        let supply_limit = self.suply_limit.may_load(deps.storage)?.unwrap_or_else(|| 1000u64);
+        let total_supply = self.total_supply.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+        let mut real_purchase = cmp::min(qty.clone(), mint_per_tx.unwrap_or_else(|| 1u64));
+        real_purchase = cmp::min(real_purchase.clone(), supply_limit - total_supply);
+        let remainder = qty.clone() - real_purchase.clone();
+        
+        let mut msg = Response::new();
+        let mint_response: Response<C> = self.mint(deps, info.clone(), "My NFT".to_string(), qty.clone(), extension.clone())?;
+        // msg.add_message(mint_response);
+        let refund_amount = sent_funds.clone() - total_fee.clone() as u128 * remainder.clone() as u128;
+        if refund_amount > 0 {
+            let send_msg = BankMsg::Send {
+                to_address: info.sender.into_string(),
+                amount: vec![coin(refund_amount, "unibi")]
+            };
+            
+        }
+        msg = msg.add_attribute("action", "buy");
+        Ok(msg)
+    }
+
+    pub fn toggle_sale_active(
+        &self,
+        deps: DepsMut,
+        sender: &Addr,
+    ) -> Result<Response<C>, ContractError> {
+        cw_ownable::assert_owner(deps.storage, sender)?;
+
+        let sale_active = self.sale_active.may_load(deps.storage)?;
+        let new_sale_active = !sale_active.unwrap_or_else(|| false);
+        self.sale_active.save(deps.storage, &new_sale_active)?;
+        
+        Ok(Response::new()
+            .add_attribute("action", "toggle_sale_active")
+            .add_attribute("sale_active", new_sale_active.to_string()))
     }
 }
 

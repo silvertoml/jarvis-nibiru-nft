@@ -16,16 +16,21 @@ where
 {
     pub contract_info: Item<'a, ContractInfoResponse>,
     pub token_count: Item<'a, u64>,
+    pub owner: Item<'a, String>,
+
     /// Stored as (granter, operator) giving operator full control over granter's account
     pub operators: Map<'a, (&'a Addr, &'a Addr), Expiration>,
     pub tokens: IndexedMap<'a, &'a str, TokenInfo<T>, TokenIndexes<'a, T>>,
     pub withdraw_address: Item<'a, String>,
+    pub sale_active: Item<'a, bool>,
 
     pub reserved_amount: Item<'a, u64>,
     pub mint_per_tx: Item<'a, u64>,
-    pub mint_price: Item<'a, u64>,
+    // pub mint_price: Item<'a, u64>, 
     pub mint_fee: Item<'a, u64>,
+    pub dev_fee: Item<'a, u64>,
     pub suply_limit: Item<'a, u64>,
+    pub total_supply: Item<'a, u64>,
     pub dev_wallet: Item<'a, String>,
     pub sale_time: Item<'a, u64>,
 
@@ -53,16 +58,19 @@ where
     fn default() -> Self {
         Self::new(
             "nft_info",
+            "ownner_info",
             "num_tokens",
             "operators",
             "tokens",
             "tokens_owner",
             "withdraw_address",
+            "sale_active",
             "reserved_amount",
             "mint_per_tx",
-            "mint_price",
             "mint_fee",
+            "dev_fee",
             "suply_limit",
+            "total supply",
             "dev_wallet",
             "sale_time",
         )
@@ -77,17 +85,20 @@ where
 {
     fn new(
         contract_key: &'a str,
+        owner_key: &'a str,
         token_count_key: &'a str,
         operator_key: &'a str,
         tokens_key: &'a str,
         tokens_owner_key: &'a str,
         withdraw_address_key: &'a str,
+        sale_active: &'a str,
 
         reserved_amount:&'a str,
         mint_per_tx:&'a str,
-        mint_price:&'a str,
         mint_fee:&'a str,
+        dev_fee:&'a str,
         suply_limit:&'a str,
+        total_supply:&'a str,
         dev_wallet:&'a str,
         sale_time:&'a str,
 
@@ -97,16 +108,19 @@ where
         };
         Self {
             contract_info: Item::new(contract_key),
+            owner: Item::new(owner_key),
             token_count: Item::new(token_count_key),
             operators: Map::new(operator_key),
             tokens: IndexedMap::new(tokens_key, indexes),
             withdraw_address: Item::new(withdraw_address_key),
+            sale_active: Item::new(sale_active),
 
             reserved_amount: Item::new(reserved_amount),
             mint_per_tx: Item::new(mint_per_tx),
-            mint_price: Item::new(mint_price),
             mint_fee: Item::new(mint_fee),
+            dev_fee: Item::new(dev_fee),
             suply_limit: Item::new(suply_limit),
+            total_supply: Item::new(total_supply),
             dev_wallet: Item::new(dev_wallet),
             sale_time: Item::new(sale_time),
 
@@ -182,4 +196,20 @@ where
 
 pub fn token_owner_idx<T>(_pk: &[u8], d: &TokenInfo<T>) -> Addr {
     d.owner.clone()
+}
+
+#[derive(Serialize, Deserialize, Debug, JsonSchema)]
+pub struct StatesResponse{
+    pub name: String,
+    pub symbol: String,
+    pub owner: String,
+    pub mint_per_tx: u64,
+    pub mint_price: u64,
+    pub mint_fee: u64,
+    pub dev_fee: u64,
+    pub supply_limit: u64,
+    pub total_supply: u64,
+    pub withdraw_address: String,
+    pub dev_wallet: String,
+    pub sale_time: u64,
 }

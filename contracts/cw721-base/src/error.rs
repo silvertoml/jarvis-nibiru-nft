@@ -24,4 +24,10 @@ pub enum ContractError {
 
     #[error("No withdraw address set")]
     NoWithdrawAddress {},
+
+    #[error("Sale Unactivate")]
+    SaleUnactivate {},
+
+    #[error("Incorrect Funds")]
+    IncorrectFunds {},
 }
