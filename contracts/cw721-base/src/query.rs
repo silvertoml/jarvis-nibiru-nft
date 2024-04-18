@@ -14,7 +14,7 @@ use cw_storage_plus::Bound;
 use cw_utils::maybe_addr;
 
 use crate::msg::{MinterResponse, QueryMsg};
-use crate::state::{Approval, Cw721Contract, TokenInfo};
+use crate::state::{Approval, Cw721Contract, StatesResponse, TokenInfo};
 
 const DEFAULT_LIMIT: u32 = 10;
 const MAX_LIMIT: u32 = 1000;
@@ -341,7 +341,10 @@ where
                 to_json_binary(&self.mint_per_tx.may_load(deps.storage)?)
             },
             QueryMsg::GetMintPrice {  } => {
-                to_json_binary(&self.mint_price.may_load(deps.storage)?)
+                let mint_fee = self.mint_fee.may_load(deps.storage)?;
+                let dev_fee = self.dev_fee.may_load(deps.storage)?;
+                let mint_price = mint_fee.unwrap_or_else(|| 0) + dev_fee.unwrap_or_else(|| 0);
+                to_json_binary(&mint_price)
             },
             QueryMsg::GetMintFee {  } => {
                 to_json_binary(&self.mint_fee.may_load(deps.storage)?)
@@ -357,6 +360,37 @@ where
             },
             QueryMsg::GetOwner {  } => {
                 to_json_binary(&self.owner.may_load(deps.storage)?)
+            },
+            QueryMsg::GetStates {  } => {
+                let contract_info = self.contract_info.may_load(deps.storage)?.unwrap_or_else(|| ContractInfoResponse{
+                    name: "None".to_string(),
+                    symbol: "None".to_string()
+                });
+                let owner = self.owner.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
+                let mint_per_tx = self.mint_per_tx.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let mint_fee = self.mint_fee.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let dev_fee = self.dev_fee.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let supply_limit = self.suply_limit.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let total_supply = self.total_supply.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let withdraw_address = self.withdraw_address.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
+                let dev_wallet = self.dev_wallet.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
+                let sale_time = self.sale_time.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+
+                let state = StatesResponse{
+                    name: contract_info.name,
+                    symbol: contract_info.symbol,
+                    owner,
+                    mint_price: mint_per_tx.clone() + dev_fee.clone(),
+                    mint_per_tx,
+                    mint_fee,
+                    dev_fee,
+                    supply_limit,
+                    total_supply,
+                    withdraw_address,
+                    dev_wallet,
+                    sale_time
+                };
+                to_json_binary(&state)
             }
         }
     }

@@ -3,6 +3,7 @@ use cosmwasm_std::{Binary, Coin};
 use cw721::Expiration;
 use cw_ownable::{cw_ownable_execute, cw_ownable_query};
 use schemars::JsonSchema;
+use crate::state::StatesResponse;
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -53,18 +54,18 @@ pub enum ExecuteMsg<T, E> {
     RevokeAll { operator: String },
 
     /// Mint a new NFT, can only be called by the contract minter
-    Mint {
-        /// Unique ID of the NFT
-        token_id: String,
-        /// The owner of the newly minter NFT
-        owner: String,
-        /// Universal resource identifier for this NFT
-        /// Should point to a JSON file that conforms to the ERC721
-        /// Metadata JSON Schema
-        token_uri: Option<String>,
-        /// Any custom extension used by this contract
-        extension: T,
-    },
+    // Mint {
+    //     /// Unique ID of the NFT
+    //     token_id: String,
+    //     /// The owner of the newly minter NFT
+    //     owner: String,
+    //     /// Universal resource identifier for this NFT
+    //     /// Should point to a JSON file that conforms to the ERC721
+    //     /// Metadata JSON Schema
+    //     token_uri: Option<String>,
+    //     /// Any custom extension used by this contract
+    //     extension: T,
+    // },
 
     /// Burn an NFT the sender has access to
     Burn { token_id: String },
@@ -77,8 +78,8 @@ pub enum ExecuteMsg<T, E> {
     /// Removes the withdraw address, so fees are sent to the contract. Only owner can call this.
     RemoveWithdrawAddress {},
     /// Withdraw from the contract to the given address. Anyone can call this,
-    /// which is okay since withdraw address has been set by owner.
     WithdrawFunds { amount: Coin },
+    /// which is okay since withdraw address has been set by owner.
 
     SetOwner { owner: String },
 
@@ -88,19 +89,17 @@ pub enum ExecuteMsg<T, E> {
     
     SetMintPerTx { tx: u64 },
     
-    SetMintPrice { price: u64 },
-    
     SetMintFee { fee: u64 },
     
     SetDevFee { fee: u64 },
-    
     SetSupplyLimit { supply_limit: u64 },
+    
     
     SetSaleTime { sale_time: u64 },
 
-    Buy { qty: u64 }
+    Buy { qty: u64, extension: T },
 
-
+    ToggleSaleActive {},
 }
 
 #[cw_ownable_query]
@@ -219,8 +218,10 @@ pub enum QueryMsg<Q: JsonSchema> {
     GetSaleTime {},
 
     #[returns(String)]
-    GetOwner {}
+    GetOwner {},
 
+    #[returns(StatesResponse)]
+    GetStates {}
 }
 
 /// Shows who can mint these tokens
