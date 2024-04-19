@@ -1,0 +1,8 @@
+{
+    "approve_all": {
+        "operator": "String",
+        "expires": {
+            "at_height": 1234567
+        }
+    }
+}
