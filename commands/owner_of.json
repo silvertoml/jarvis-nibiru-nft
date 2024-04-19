@@ -1,0 +1,6 @@
+{
+    "owner_of": {
+        "token_id": "my token_id",
+        "include_expired": true
+    }
+}

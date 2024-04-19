@@ -1,0 +1,8 @@
+{
+    "withdraw_funds": { 
+        "amount": {
+            "amount": "1000",
+            "denom": "unibi"
+        }
+    }
+}

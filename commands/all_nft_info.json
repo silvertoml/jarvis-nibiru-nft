@@ -1,0 +1,6 @@
+{
+    "all_nft_info": {
+        "token_id": "my token id",
+        "include_expired": true
+    }
+}

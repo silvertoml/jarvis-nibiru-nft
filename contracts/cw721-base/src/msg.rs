@@ -92,8 +92,8 @@ pub enum ExecuteMsg<T, E> {
     SetMintFee { fee: u64 },
     
     SetDevFee { fee: u64 },
-    SetSupplyLimit { supply_limit: u64 },
-    
+
+    SetSupplyLimit { supply_limit: u64 },    
     
     SetSaleTime { sale_time: u64 },
 
