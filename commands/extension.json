@@ -1,0 +1,8 @@
+{
+    "extension": { 
+        "msg": {
+            "type": "SomeType",
+            "details": "Specific details related to the query"
+        }
+    }
+}

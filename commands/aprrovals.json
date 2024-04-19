@@ -1,0 +1,6 @@
+{
+    "approvals": {
+        "token_id": "my token id",
+        "include_expired": true
+    }
+}
