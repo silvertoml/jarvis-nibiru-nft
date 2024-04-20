@@ -9,8 +9,8 @@ optimize:
 
 WALLET=nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692
 WALLET_NAME=wallet
-CODE_ID=424
-NFT_CONTRACT=nibi1jrprzsqfudyq7xl3t5npa4m5f4m7sqdfq83nnj4svtple43y97wql99p59
+CODE_ID=428
+NFT_CONTRACT=nibi15u3nsn62lrtk6as9klxcwhryrd0vsppzwhgckqvmdum2zk4y6d8qp3f20x
 
 
 make-wallet:
@@ -132,6 +132,10 @@ extension:
 get_states:
 	$(eval get_states := $$(shell cat ./commands/get_states.json))
 	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_states)'
+
+get_dev_fee:
+	$(eval get_dev_fee := $$(shell cat ./commands/get_dev_fee.json))
+	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_dev_fee)'
 
 get_mint_fee:
 	$(eval get_mint_fee := $$(shell cat ./commands/get_mint_fee.json))

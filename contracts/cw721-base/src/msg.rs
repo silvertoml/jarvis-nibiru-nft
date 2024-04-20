@@ -208,6 +208,9 @@ pub enum QueryMsg<Q: JsonSchema> {
     GetMintPrice {},
 
     #[returns(u64)]
+    GetDevFee {},
+
+    #[returns(u64)]
     GetMintFee {},
 
     #[returns(u64)]

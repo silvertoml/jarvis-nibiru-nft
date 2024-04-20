@@ -346,6 +346,9 @@ where
                 let mint_price = mint_fee.unwrap_or_else(|| 0) + dev_fee.unwrap_or_else(|| 0);
                 to_json_binary(&mint_price)
             },
+            QueryMsg::GetDevFee {  } => {
+                to_json_binary(&self.dev_fee.may_load(deps.storage)?)
+            },
             QueryMsg::GetMintFee {  } => {
                 to_json_binary(&self.mint_fee.may_load(deps.storage)?)
             },
