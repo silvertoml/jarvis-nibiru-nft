@@ -355,6 +355,9 @@ where
             QueryMsg::GetTotalSupply {  } => {
                 to_json_binary(&self.total_supply.may_load(deps.storage)?)
             },
+            QueryMsg::GetReservedAmount {  } => {
+                to_json_binary(&self.reserved_amount.may_load(deps.storage)?)
+            }
             QueryMsg::GetSaleTime {  } => {
                 to_json_binary(&self.sale_time.may_load(deps.storage)?)
             },
@@ -372,6 +375,7 @@ where
                 let dev_fee = self.dev_fee.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
                 let supply_limit = self.suply_limit.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
                 let total_supply = self.total_supply.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let reserved_amount = self.reserved_amount.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
                 let withdraw_address = self.withdraw_address.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
                 let dev_wallet = self.dev_wallet.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
                 let sale_time = self.sale_time.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
@@ -386,6 +390,7 @@ where
                     dev_fee,
                     supply_limit,
                     total_supply,
+                    reserved_amount,
                     withdraw_address,
                     dev_wallet,
                     sale_time

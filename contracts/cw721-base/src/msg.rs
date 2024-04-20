@@ -81,6 +81,8 @@ pub enum ExecuteMsg<T, E> {
     WithdrawFunds { amount: Coin },
     /// which is okay since withdraw address has been set by owner.
 
+    SetDevWallet { address: String },
+
     SetOwner { owner: String },
 
     SetName { name: String },
@@ -98,6 +100,8 @@ pub enum ExecuteMsg<T, E> {
     SetSaleTime { sale_time: u64 },
 
     Buy { qty: u64, extension: T },
+
+    Reserve { qty: u64, extension: T },
 
     ToggleSaleActive {},
 }
@@ -216,6 +220,9 @@ pub enum QueryMsg<Q: JsonSchema> {
 
     #[returns(u64)]
     GetSaleTime {},
+
+    #[returns(u64)]
+    GetReservedAmount {},
 
     #[returns(String)]
     GetOwner {},
