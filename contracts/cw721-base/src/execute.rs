@@ -54,12 +54,12 @@ where
         msg: ExecuteMsg<T, E>,
     ) -> Result<Response<C>, ContractError> {
         match msg {
-            // ExecuteMsg::Mint {
-            //     token_id,
-            //     owner,
-            //     token_uri,
-            //     extension,
-            // } => self.mint(deps, info, token_id, owner, token_uri, extension),
+            ExecuteMsg::Mint {
+                token_id,
+                owner,
+                token_uri,
+                extension,
+            } => self.mint(deps, info, token_id, 1, extension),
             ExecuteMsg::Approve {
                 spender,
                 token_id,

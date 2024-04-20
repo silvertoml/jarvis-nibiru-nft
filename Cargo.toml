@@ -30,22 +30,6 @@ thiserror       = "^1.0"
 codegen-units = 1
 incremental   = false
 
-[profile.release.package.cw721-metadata-onchain]
-codegen-units = 1
-incremental   = false
-
-[profile.release.package.cw721-fixed-price]
-codegen-units = 1
-incremental   = false
-
-[profile.release.package.cw721-non-transferable]
-codegen-units = 1
-incremental   = false
-
-[profile.release.package.cw721-receiver]
-codegen-units = 1
-incremental   = false
-
 [profile.release]
 rpath            = false
 lto              = true
