@@ -1,6 +1,6 @@
 {
     "reserve": { 
-        "qty": 2, 
+        "qty": 4, 
         "extension": {
             "detail": "Example detail",
             "additionalInfo": "More information here"

@@ -1,7 +1,7 @@
 {
     "send_nft": {
-        "contract": "nibi178kzznh9cepjckjefqc3mgt9gf9rfkyw6kk0pymeypx9rplggvyq9yjjuv",
-        "token_id": "my token id",
+        "contract": "nibi1hc3cl36mnty08e34cp6gy4rnej378w7qhrxjxxzq3jdm04qa5w5seqwemv",
+        "token_id": "jarvis #23",
         "msg": "eyJhY3Rpb24iOiAiZGlzcGxheSJ9"
     }
 }
