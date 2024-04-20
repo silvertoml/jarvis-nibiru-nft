@@ -16,7 +16,6 @@ where
 {
     pub contract_info: Item<'a, ContractInfoResponse>,
     pub token_count: Item<'a, u64>,
-    pub owner: Item<'a, String>,
 
     /// Stored as (granter, operator) giving operator full control over granter's account
     pub operators: Map<'a, (&'a Addr, &'a Addr), Expiration>,
@@ -26,7 +25,6 @@ where
 
     pub reserved_amount: Item<'a, u64>,
     pub mint_per_tx: Item<'a, u64>,
-    // pub mint_price: Item<'a, u64>, 
     pub mint_fee: Item<'a, u64>,
     pub dev_fee: Item<'a, u64>,
     pub suply_limit: Item<'a, u64>,
@@ -58,7 +56,6 @@ where
     fn default() -> Self {
         Self::new(
             "nft_info",
-            "ownner_info",
             "num_tokens",
             "operators",
             "tokens",
@@ -85,7 +82,6 @@ where
 {
     fn new(
         contract_key: &'a str,
-        owner_key: &'a str,
         token_count_key: &'a str,
         operator_key: &'a str,
         tokens_key: &'a str,
@@ -108,7 +104,6 @@ where
         };
         Self {
             contract_info: Item::new(contract_key),
-            owner: Item::new(owner_key),
             token_count: Item::new(token_count_key),
             operators: Map::new(operator_key),
             tokens: IndexedMap::new(tokens_key, indexes),
@@ -202,7 +197,6 @@ pub fn token_owner_idx<T>(_pk: &[u8], d: &TokenInfo<T>) -> Addr {
 pub struct StatesResponse{
     pub name: String,
     pub symbol: String,
-    pub owner: String,
     pub mint_per_tx: u64,
     pub mint_price: u64,
     pub mint_fee: u64,
