@@ -7,9 +7,9 @@ optimize:
 		--mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
 		cosmwasm/rust-optimizer:0.14.0
 
-WALLET=nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692
-WALLET_NAME=wallet
-CODE_ID=433
+WALLET=nibi1uds8m92jzp465px8xjmuj4jmhcd5h2wsh404cl
+WALLET_NAME=jarvis
+CODE_ID=437
 NFT_CONTRACT=nibi1k3z45lxqeulsyffry77djz2f303echnaa5djgda2fk8n8zphyqtq2ffqq4
 
 
