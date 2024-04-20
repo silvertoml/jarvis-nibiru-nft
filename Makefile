@@ -9,8 +9,8 @@ optimize:
 
 WALLET=nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692
 WALLET_NAME=wallet
-CODE_ID=413
-NFT_CONTRACT=nibi178kzznh9cepjckjefqc3mgt9gf9rfkyw6kk0pymeypx9rplggvyq9yjjuv
+CODE_ID=424
+NFT_CONTRACT=nibi1vfw6r9rs4fz0r5shehv4yhllgeqn5gfetgyl3hgyrpu5pmj9c7rszmcauh
 
 
 make-wallet:
@@ -23,10 +23,11 @@ get-balance:
 	@nibid query bank balances ${WALLET} --denom unibi
 
 upload-testnet:
-	@nibid tx wasm store artifacts/jarvis_airdrop.wasm --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes
+	@nibid tx wasm store artifacts/cw721_base.wasm --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes
 
 instantiate-testnet:
-	@nibid tx wasm instantiate ${CODE_ID} '{"count": 1}' --admin ${WALLET} --label airdrop --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes
+	$(eval instantiate := $$(shell cat ./commands/instantiate.json))
+	@nibid tx wasm instantiate ${CODE_ID} '$(instantiate)' --admin ${WALLET} --label airdrop --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes
 
 exe_approve:
 	$(eval exe_approve := $$(shell cat ./commands/exe_approve.json))
@@ -39,6 +40,10 @@ exe_burn:
 exe_buy:
 	$(eval exe_buy := $$(shell cat ./commands/exe_buy.json))
 	@nibid tx wasm execute ${NFT_CONTRACT} '$(exe_buy)' --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes 
+
+exe_reserve:
+	$(eval exe_reserve := $$(shell cat ./commands/exe_reserve.json))
+	@nibid tx wasm execute ${NFT_CONTRACT} '$(exe_reserve)' --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes 
 
 exe_revoke_all:
 	$(eval exe_revoke_all := $$(shell cat ./commands/exe_revoke_all.json))
@@ -88,6 +93,10 @@ set_symbol:
 	$(eval set_symbol := $$(shell cat ./commands/set_symbol.json))
 	@nibid tx wasm execute ${NFT_CONTRACT} '$(set_symbol)' --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes 
 
+set_dev_wallet:
+	$(eval set_dev_wallet := $$(shell cat ./commands/set_dev_wallet.json))
+	@nibid tx wasm execute ${NFT_CONTRACT} '$(set_dev_wallet)' --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes 
+
 set_withdraw_address:
 	$(eval set_withdraw_address := $$(shell cat ./commands/set_withdraw_address.json))
 	@nibid tx wasm execute ${NFT_CONTRACT} '$(set_withdraw_address)' --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes 
@@ -123,6 +132,10 @@ contract_info:
 extension:
 	$(eval extension := $$(shell cat ./commands/extension.json))
 	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(extension)'
+
+get_states:
+	$(eval get_states := $$(shell cat ./commands/get_states.json))
+	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_states)'
 
 get_mint_fee:
 	$(eval get_mint_fee := $$(shell cat ./commands/get_mint_fee.json))
@@ -163,6 +176,10 @@ get_symbol:
 get_total_supply:
 	$(eval get_total_supply := $$(shell cat ./commands/get_total_supply.json))
 	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_total_supply)'
+
+get_reserved_amount:
+	$(eval get_reserved_amount := $$(shell cat ./commands/get_reserved_amount.json))
+	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_reserved_amount)'
 
 get_withdraw_address:
 	$(eval get_withdraw_address := $$(shell cat ./commands/get_withdraw_address.json))
