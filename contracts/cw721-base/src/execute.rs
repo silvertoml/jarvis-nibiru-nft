@@ -146,8 +146,9 @@ where
                 token_uri: Some(format!("https://ipfs.io/ipfs/bafybeigrytqzipxv4sekrofqfz4etp4f6c7a3bssi5oyerccmeksm4czku/{}", total_supply.clone() + i + 1)),
                 extension: extension.clone(),
             };
+            let new_token_id = format!("{} #{}", token_id.clone(), total_supply.clone() + i + 1);
             self.tokens
-            .update(deps.storage, &token_id, |old| match old {
+            .update(deps.storage, &new_token_id, |old| match old {
                 Some(_) => Err(ContractError::Claimed {}),
                 None => Ok(token),
             })?;
@@ -395,7 +396,7 @@ where
         let remainder = qty.clone() - real_purchase.clone();
         
         let mut msg = Response::new();
-        let mint_response: Response<C> = self.mint(deps, info.clone(), format!("jarvis #{}", total_supply.clone()), qty.clone(), extension.clone())?;
+        let mint_response: Response<C> = self.mint(deps, info.clone(), "jarvis".to_string(), qty.clone(), extension.clone())?;
         // msg.add_message(mint_response);
         let refund_amount = sent_funds.clone() - total_fee.clone() as u128 * remainder.clone() as u128;
         if refund_amount > 0 {
@@ -431,13 +432,14 @@ where
         let supply_limit = self.suply_limit.may_load(deps.storage)?.unwrap_or_else(|| 1000u64);
         let total_supply = self.total_supply.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
         let mut reserved_amount = self.reserved_amount.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
-        let mut real_purchase = cmp::min(qty.clone(), mint_per_tx.unwrap_or_else(|| 1u64));
-        real_purchase = cmp::min(real_purchase.clone(), supply_limit - total_supply);
+        let real_purchase = cmp::min(qty.clone(), supply_limit - total_supply);
         
-        let mut msg = Response::new();
-        let mint_response: Response<C> = self.mint(deps, info.clone(), "My NFT".to_string(), qty.clone(), extension.clone())?;
-        // msg.add_message(mint_response);
         reserved_amount += real_purchase.clone();
+        self.reserved_amount.save(deps.storage, &reserved_amount)?;
+
+        let mut msg = Response::new();
+        let mint_response: Response<C> = self.mint(deps, info.clone(), "jarvis".to_string(), qty.clone(), extension.clone())?;
+        // msg.add_message(mint_response);
         
         msg = msg
             .add_attribute("action", "reserve")
