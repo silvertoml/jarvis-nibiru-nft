@@ -10,7 +10,7 @@ optimize:
 WALLET=nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692
 WALLET_NAME=wallet
 CODE_ID=424
-NFT_CONTRACT=nibi1vfw6r9rs4fz0r5shehv4yhllgeqn5gfetgyl3hgyrpu5pmj9c7rszmcauh
+NFT_CONTRACT=nibi1jrprzsqfudyq7xl3t5npa4m5f4m7sqdfq83nnj4svtple43y97wql99p59
 
 
 make-wallet:
@@ -76,10 +76,6 @@ set_mint_per_tx:
 set_name:
 	$(eval set_name := $$(shell cat ./commands/set_name.json))
 	@nibid tx wasm execute ${NFT_CONTRACT} '$(set_name)' --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes 
-
-set_owner:
-	$(eval set_owner := $$(shell cat ./commands/set_owner.json))
-	@nibid tx wasm execute ${NFT_CONTRACT} '$(set_owner)' --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes 
 
 set_sale_time:
 	$(eval set_sale_time := $$(shell cat ./commands/set_sale_time.json))
@@ -160,10 +156,6 @@ get_owner:
 get_sale_time:
 	$(eval GET_NFT_CONTRACT_ADDRESS := $$(shell cat ./commands/get_sale_time.json))
 	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_sale_time)'
-
-get_states:
-	$(eval get_states := $$(shell cat ./commands/get_states.json))
-	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_states)'
 
 get_supply_limit:
 	$(eval get_supply_limit := $$(shell cat ./commands/get_supply_limit.json))

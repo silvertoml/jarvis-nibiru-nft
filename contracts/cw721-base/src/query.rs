@@ -361,19 +361,15 @@ where
             QueryMsg::GetSaleTime {  } => {
                 to_json_binary(&self.sale_time.may_load(deps.storage)?)
             },
-            QueryMsg::GetOwner {  } => {
-                to_json_binary(&self.owner.may_load(deps.storage)?)
-            },
             QueryMsg::GetStates {  } => {
                 let contract_info = self.contract_info.may_load(deps.storage)?.unwrap_or_else(|| ContractInfoResponse{
                     name: "None".to_string(),
                     symbol: "None".to_string()
                 });
-                let owner = self.owner.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
-                let mint_per_tx = self.mint_per_tx.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let mint_per_tx = self.mint_per_tx.may_load(deps.storage)?.unwrap_or_else(|| 1u64);
                 let mint_fee = self.mint_fee.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
                 let dev_fee = self.dev_fee.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
-                let supply_limit = self.suply_limit.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let supply_limit = self.suply_limit.may_load(deps.storage)?.unwrap_or_else(|| 100000u64);
                 let total_supply = self.total_supply.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
                 let reserved_amount = self.reserved_amount.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
                 let withdraw_address = self.withdraw_address.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
@@ -383,7 +379,6 @@ where
                 let state = StatesResponse{
                     name: contract_info.name,
                     symbol: contract_info.symbol,
-                    owner,
                     mint_price: mint_per_tx.clone() + dev_fee.clone(),
                     mint_per_tx,
                     mint_fee,

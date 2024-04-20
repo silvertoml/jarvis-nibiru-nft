@@ -32,6 +32,22 @@ where
             symbol: msg.symbol,
         };
         self.contract_info.save(deps.storage, &contract_info)?;
+        let mint_per_tx = 1u64;
+        let mint_fee = 0u64;
+        let dev_fee = 0u64;
+        let suply_limit = 100000u64;
+        let total_supply = 0u64;
+        let reserved_amount = 0u64;
+        let dev_wallet = info.clone().sender.to_string();
+        let sale_time = 0u64;
+        self.mint_per_tx.save(deps.storage, &mint_per_tx)?;
+        self.mint_fee.save(deps.storage, &mint_fee)?;
+        self.dev_fee.save(deps.storage, &dev_fee)?;
+        self.suply_limit.save(deps.storage, &suply_limit)?;
+        self.total_supply.save(deps.storage, &total_supply)?;
+        self.reserved_amount.save(deps.storage, &reserved_amount)?;
+        self.dev_wallet.save(deps.storage, &dev_wallet)?;
+        self.sale_time.save(deps.storage, &sale_time)?;
 
         let owner = match msg.minter {
             Some(owner) => deps.api.addr_validate(&owner)?,
@@ -42,7 +58,7 @@ where
         if let Some(address) = msg.withdraw_address {
             self.set_withdraw_address(deps, &owner, address)?;
         }
-
+        
         Ok(Response::default())
     }
 
@@ -90,7 +106,6 @@ where
                 self.remove_withdraw_address(deps.storage, &info.sender)
             }
             ExecuteMsg::WithdrawFunds { amount } => self.withdraw_funds(deps.storage, &amount),
-            ExecuteMsg::SetOwner { owner } => self.set_owner(deps.storage, &info.sender, &owner),
             ExecuteMsg::SetName { name } => self.set_name(deps.storage, &info.sender, &name),
             ExecuteMsg::SetSymbol { symbol } => self.set_symbol(deps.storage, &info.sender, &symbol),
             ExecuteMsg::SetMintPerTx { tx } => self.set_mint_per_tx(deps, &info.sender, &tx),
@@ -225,21 +240,6 @@ where
             }
             None => Err(ContractError::NoWithdrawAddress {}),
         }
-    }
-
-    pub fn set_owner(
-        &self,
-        storage: &mut dyn Storage,
-        sender: &Addr,
-        owner: &String,
-    ) -> Result<Response<C>, ContractError> {
-        // self.contract_info.save(deps.storage, &contract_info)?;
-        // self
-        cw_ownable::assert_owner(storage, sender)?;
-        self.owner.save(storage, &owner)?;
-        Ok(Response::new()
-            .add_attribute("action", "set_owner")
-            .add_attribute("owner", owner))
     }
 
     pub fn set_name(
@@ -395,7 +395,7 @@ where
         let remainder = qty.clone() - real_purchase.clone();
         
         let mut msg = Response::new();
-        let mint_response: Response<C> = self.mint(deps, info.clone(), "My NFT".to_string(), qty.clone(), extension.clone())?;
+        let mint_response: Response<C> = self.mint(deps, info.clone(), format!("jarvis #{}", total_supply.clone()), qty.clone(), extension.clone())?;
         // msg.add_message(mint_response);
         let refund_amount = sent_funds.clone() - total_fee.clone() as u128 * remainder.clone() as u128;
         if refund_amount > 0 {
