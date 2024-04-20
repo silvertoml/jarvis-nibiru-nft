@@ -83,8 +83,6 @@ pub enum ExecuteMsg<T, E> {
 
     SetDevWallet { address: String },
 
-    SetOwner { owner: String },
-
     SetName { name: String },
 
     SetSymbol { symbol: String },
@@ -210,6 +208,9 @@ pub enum QueryMsg<Q: JsonSchema> {
     GetMintPrice {},
 
     #[returns(u64)]
+    GetDevFee {},
+
+    #[returns(u64)]
     GetMintFee {},
 
     #[returns(u64)]
@@ -223,9 +224,6 @@ pub enum QueryMsg<Q: JsonSchema> {
 
     #[returns(u64)]
     GetReservedAmount {},
-
-    #[returns(String)]
-    GetOwner {},
 
     #[returns(StatesResponse)]
     GetStates {}
