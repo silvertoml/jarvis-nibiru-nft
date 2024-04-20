@@ -1,0 +1,9 @@
+{
+    "reserve": { 
+        "qty": 2, 
+        "extension": {
+            "detail": "Example detail",
+            "additionalInfo": "More information here"
+        }
+    }
+}
