@@ -1,13 +1,11 @@
 build:
-	cargo wasm
+	cd contracts/cw721-base/ && cargo wasm && cd ../../
 
 optimize:
 	docker run --rm -v "$$(pwd)":/code \
 		--mount type=volume,source="$$(basename "$$(pwd)")_cache",target=/code/target \
 		--mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
 		cosmwasm/rust-optimizer:0.14.0
-test:
-	cargo unit-test
 
 WALLET=nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692
 WALLET_NAME=wallet
@@ -37,10 +35,6 @@ exe_approve:
 exe_burn:
 	$(eval exe_burn := $$(shell cat ./commands/exe_burn.json))
 	@nibid tx wasm execute ${NFT_CONTRACT} '$(exe_burn)' --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes 
-
-exe_buy:
-	$(eval exe_buy := $$(shell cat ./commands/exe_buy.json))
-	@nibid tx wasm execute ${NFT_CONTRACT} '$(exe_buy)' --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes 
 
 exe_buy:
 	$(eval exe_buy := $$(shell cat ./commands/exe_buy.json))
