@@ -9,8 +9,8 @@ optimize:
 
 WALLET=nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692
 WALLET_NAME=wallet
-CODE_ID=428
-NFT_CONTRACT=nibi15u3nsn62lrtk6as9klxcwhryrd0vsppzwhgckqvmdum2zk4y6d8qp3f20x
+CODE_ID=433
+NFT_CONTRACT=nibi1k3z45lxqeulsyffry77djz2f303echnaa5djgda2fk8n8zphyqtq2ffqq4
 
 
 make-wallet:
