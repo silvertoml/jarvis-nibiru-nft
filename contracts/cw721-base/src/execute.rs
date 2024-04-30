@@ -377,7 +377,7 @@ where
             return Err(ContractError::SaleUnactivate {});
         }
 
-        let sent_funds: u128 = info.funds.iter().find(|coin| coin.denom == "unibi").map_or(0u128, |coin| coin.amount.u128());
+        let sent_funds: u128 = info.funds.iter().find(|coin| coin.denom == "usei").map_or(0u128, |coin| coin.amount.u128());
         let mint_fee = self.mint_fee.may_load(deps.storage)?.unwrap_or_else(|| 0);
         let dev_fee = self.dev_fee.may_load(deps.storage)?.unwrap_or_else(|| 0);
         let mint_per_tx = self.mint_per_tx.may_load(deps.storage)?;
@@ -402,16 +402,16 @@ where
         if refund_amount > 0 {
             let send_msg = BankMsg::Send {
                 to_address: info.sender.into_string(),
-                amount: vec![coin(refund_amount, "unibi")]
+                amount: vec![coin(refund_amount, "usei")]
             };
         }
         let mint_fee_send = BankMsg::Send {
             to_address: withdraw_address.clone().to_string(),
-            amount: vec![coin(mint_fee.clone() as u128 * real_purchase.clone() as u128, "unibi")]
+            amount: vec![coin(mint_fee.clone() as u128 * real_purchase.clone() as u128, "usei")]
         };
         let dev_fee_send = BankMsg::Send {
             to_address: dev_wallet.clone().to_string(),
-            amount: vec![coin(refund_amount, "unibi")]
+            amount: vec![coin(refund_amount, "usei")]
         };
 
         msg = msg.add_attribute("action", "buy");
