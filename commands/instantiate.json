@@ -1,6 +1,7 @@
 {
     "name": "Jarvis NFT",
     "symbol": "JNFT",
+    "base_uri": "",
     "minter": "nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692",
     "withdraw_address": "nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692"
 }
