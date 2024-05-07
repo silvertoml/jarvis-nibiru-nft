@@ -18,12 +18,16 @@ use crate::{
 const MINTER: &str = "merlin";
 const CONTRACT_NAME: &str = "Magic Power";
 const SYMBOL: &str = "MGK";
+const BASE_URI: &str = "";
+const TOKEN_ID_BASE: &str = "";
 
 fn setup_contract(deps: DepsMut<'_>) -> Cw721Contract<'static, Extension, Empty, Empty, Empty> {
     let contract = Cw721Contract::default();
     let msg = InstantiateMsg {
         name: CONTRACT_NAME.to_string(),
         symbol: SYMBOL.to_string(),
+        base_uri: BASE_URI.to_string(),
+        token_id_base: TOKEN_ID_BASE.to_string(),
         minter: Some(String::from(MINTER)),
         withdraw_address: None,
     };
@@ -41,6 +45,8 @@ fn proper_instantiation() {
     let msg = InstantiateMsg {
         name: CONTRACT_NAME.to_string(),
         symbol: SYMBOL.to_string(),
+        base_uri: BASE_URI.to_string(),
+        token_id_base: TOKEN_ID_BASE.to_string(),
         minter: Some(String::from(MINTER)),
         withdraw_address: Some(String::from(MINTER)),
     };
