@@ -16,6 +16,8 @@ where
 {
     pub contract_info: Item<'a, ContractInfoResponse>,
     pub token_count: Item<'a, u64>,
+    pub base_uri: Item<'a, String>,
+    pub token_id_base: Item<'a, String>,
 
     /// Stored as (granter, operator) giving operator full control over granter's account
     pub operators: Map<'a, (&'a Addr, &'a Addr), Expiration>,
@@ -57,6 +59,8 @@ where
         Self::new(
             "nft_info",
             "num_tokens",
+            "base_uri",
+            "token_id_base",
             "operators",
             "tokens",
             "tokens_owner",
@@ -83,21 +87,22 @@ where
     fn new(
         contract_key: &'a str,
         token_count_key: &'a str,
+        base_uri: &'a str,
+        token_id_base: &'a str,
         operator_key: &'a str,
         tokens_key: &'a str,
         tokens_owner_key: &'a str,
         withdraw_address_key: &'a str,
         sale_active: &'a str,
 
-        reserved_amount:&'a str,
-        mint_per_tx:&'a str,
-        mint_fee:&'a str,
-        dev_fee:&'a str,
-        suply_limit:&'a str,
-        total_supply:&'a str,
-        dev_wallet:&'a str,
-        sale_time:&'a str,
-
+        reserved_amount: &'a str,
+        mint_per_tx: &'a str,
+        mint_fee: &'a str,
+        dev_fee: &'a str,
+        suply_limit: &'a str,
+        total_supply: &'a str,
+        dev_wallet: &'a str,
+        sale_time: &'a str,
     ) -> Self {
         let indexes = TokenIndexes {
             owner: MultiIndex::new(token_owner_idx, tokens_key, tokens_owner_key),
@@ -105,6 +110,8 @@ where
         Self {
             contract_info: Item::new(contract_key),
             token_count: Item::new(token_count_key),
+            base_uri: Item::new(base_uri),
+            token_id_base: Item::new(token_id_base),
             operators: Map::new(operator_key),
             tokens: IndexedMap::new(tokens_key, indexes),
             withdraw_address: Item::new(withdraw_address_key),
@@ -194,7 +201,7 @@ pub fn token_owner_idx<T>(_pk: &[u8], d: &TokenInfo<T>) -> Addr {
 }
 
 #[derive(Serialize, Deserialize, Debug, JsonSchema)]
-pub struct StatesResponse{
+pub struct StatesResponse {
     pub name: String,
     pub symbol: String,
     pub mint_per_tx: u64,

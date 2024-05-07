@@ -1,9 +1,9 @@
+use crate::state::StatesResponse;
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Binary, Coin};
 use cw721::Expiration;
 use cw_ownable::{cw_ownable_execute, cw_ownable_query};
 use schemars::JsonSchema;
-use crate::state::StatesResponse;
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -12,6 +12,9 @@ pub struct InstantiateMsg {
     /// Symbol of the NFT contract
     pub symbol: String,
 
+    pub base_uri: String,
+
+    pub token_id_base: String,
     /// The minter is the only one who can create new NFTs.
     /// This is designed for a base NFT that is controlled by an external program
     /// or contract. You will likely replace this with custom logic in custom NFTs
@@ -27,7 +30,10 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg<T, E> {
     /// Transfer is a base message to move a token to another account without triggering actions
-    TransferNft { recipient: String, token_id: String },
+    TransferNft {
+        recipient: String,
+        token_id: String,
+    },
     /// Send is a base message to transfer a token to a contract and trigger an action
     /// on the receiving contract.
     SendNft {
@@ -43,7 +49,10 @@ pub enum ExecuteMsg<T, E> {
         expires: Option<Expiration>,
     },
     /// Remove previously granted Approval
-    Revoke { spender: String, token_id: String },
+    Revoke {
+        spender: String,
+        token_id: String,
+    },
     /// Allows operator to transfer / send any token from the owner's account.
     /// If expiration is set, then this allowance has a time/height limit
     ApproveAll {
@@ -51,7 +60,9 @@ pub enum ExecuteMsg<T, E> {
         expires: Option<Expiration>,
     },
     /// Remove previously granted ApproveAll permission
-    RevokeAll { operator: String },
+    RevokeAll {
+        operator: String,
+    },
 
     /// Mint a new NFT, can only be called by the contract minter
     Mint {
@@ -68,38 +79,67 @@ pub enum ExecuteMsg<T, E> {
     },
 
     /// Burn an NFT the sender has access to
-    Burn { token_id: String },
+    Burn {
+        token_id: String,
+    },
 
     /// Extension msg
-    Extension { msg: E },
+    Extension {
+        msg: E,
+    },
 
     /// Sets address to send withdrawn fees to. Only owner can call this.
-    SetWithdrawAddress { address: String },
+    SetWithdrawAddress {
+        address: String,
+    },
     /// Removes the withdraw address, so fees are sent to the contract. Only owner can call this.
     RemoveWithdrawAddress {},
     /// Withdraw from the contract to the given address. Anyone can call this,
-    WithdrawFunds { amount: Coin },
+    WithdrawFunds {
+        amount: Coin,
+    },
     /// which is okay since withdraw address has been set by owner.
+    SetDevWallet {
+        address: String,
+    },
 
-    SetDevWallet { address: String },
+    SetName {
+        name: String,
+    },
 
-    SetName { name: String },
+    SetSymbol {
+        symbol: String,
+    },
 
-    SetSymbol { symbol: String },
-    
-    SetMintPerTx { tx: u64 },
-    
-    SetMintFee { fee: u64 },
-    
-    SetDevFee { fee: u64 },
+    SetMintPerTx {
+        tx: u64,
+    },
 
-    SetSupplyLimit { supply_limit: u64 },    
-    
-    SetSaleTime { sale_time: u64 },
+    SetMintFee {
+        fee: u64,
+    },
 
-    Buy { qty: u64, extension: T },
+    SetDevFee {
+        fee: u64,
+    },
 
-    Reserve { qty: u64, extension: T },
+    SetSupplyLimit {
+        supply_limit: u64,
+    },
+
+    SetSaleTime {
+        sale_time: u64,
+    },
+
+    Buy {
+        qty: u64,
+        extension: T,
+    },
+
+    Reserve {
+        qty: u64,
+        extension: T,
+    },
 
     ToggleSaleActive {},
 }
@@ -226,7 +266,7 @@ pub enum QueryMsg<Q: JsonSchema> {
     GetReservedAmount {},
 
     #[returns(StatesResponse)]
-    GetStates {}
+    GetStates {},
 }
 
 /// Shows who can mint these tokens

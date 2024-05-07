@@ -109,6 +109,8 @@ mod tests {
             InstantiateMsg {
                 name: "".into(),
                 symbol: "".into(),
+                base_uri: "".into(),
+                token_id_base: "".into,
                 minter: Some("other".into()),
                 withdraw_address: None,
             },
@@ -142,6 +144,8 @@ mod tests {
             InstantiateMsg {
                 name: "".into(),
                 symbol: "".into(),
+                base_uri: "".into(),
+                token_id_base: "".into,
                 minter: None,
                 withdraw_address: None,
             },
