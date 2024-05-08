@@ -33,26 +33,28 @@ where
             symbol: msg.symbol,
         };
         self.contract_info.save(deps.storage, &contract_info)?;
-        let mint_per_tx = 1u64;
-        let mint_fee = 0u64;
-        let dev_fee = 0u64;
-        let suply_limit = 100000u64;
-        let total_supply = 0u64;
-        let reserved_amount = 0u64;
-        let dev_wallet = info.clone().sender.to_string();
         let base_uri = msg.base_uri.clone();
         let token_id_base = msg.token_id_base.clone();
-        let sale_time = 0u64;
+        
+        let mint_per_tx = msg.mint_per_tx.unwrap_or_else(|| 1u64);
+        let mint_fee = msg.mint_fee.unwrap_or_else(|| 0u64);
+        let dev_fee = msg.dev_fee.unwrap_or_else(|| 0u64);
+        let supply_limit = msg.supply_limit.unwrap_or_else(|| 100000u64);
+        let total_supply = msg.total_supply.unwrap_or_else(|| 0u64);
+        let reserved_amount = msg.reserved_amount.unwrap_or_else(|| 0u64);
+        let dev_wallet = msg.dev_wallet.unwrap_or_else(|| info.clone().sender.to_string());
+        let sale_time = msg.sale_time.unwrap_or_else(|| 0u64);
+
         self.mint_per_tx.save(deps.storage, &mint_per_tx)?;
         self.mint_fee.save(deps.storage, &mint_fee)?;
         self.dev_fee.save(deps.storage, &dev_fee)?;
-        self.suply_limit.save(deps.storage, &suply_limit)?;
+        self.supply_limit.save(deps.storage, &supply_limit)?;
         self.total_supply.save(deps.storage, &total_supply)?;
         self.reserved_amount.save(deps.storage, &reserved_amount)?;
         self.dev_wallet.save(deps.storage, &dev_wallet)?;
         self.sale_time.save(deps.storage, &sale_time)?;
-        let _ = self.base_uri.save(deps.storage, &base_uri);
-        let _ = self.token_id_base.save(deps.storage, &token_id_base);
+        self.base_uri.save(deps.storage, &base_uri)?;
+        self.token_id_base.save(deps.storage, &token_id_base)?;
 
         let owner = match msg.minter {
             Some(owner) => deps.api.addr_validate(&owner)?,
@@ -364,7 +366,7 @@ where
     ) -> Result<Response<C>, ContractError> {
         cw_ownable::assert_owner(deps.storage, sender)?;
 
-        self.suply_limit.save(deps.storage, &supply_limit)?;
+        self.supply_limit.save(deps.storage, &supply_limit)?;
         Ok(Response::new()
             .add_attribute("action", "set_supply_limit")
             .add_attribute("supply_limit", supply_limit.to_string()))
@@ -423,7 +425,7 @@ where
         }
 
         let supply_limit = self
-            .suply_limit
+            .supply_limit
             .may_load(deps.storage)?
             .unwrap_or_else(|| 1000u64);
         let total_supply = self
@@ -476,10 +478,10 @@ where
     ) -> Result<Response<C>, ContractError> {
         cw_ownable::assert_owner(deps.storage, &info.clone().sender)?;
 
-        let mint_per_tx = self.mint_per_tx.may_load(deps.storage)?;
+        let mint_per_tx = self.mint_per_tx.may_load(deps.storage)?.unwrap_or_else(|| 1000u64);
 
         let supply_limit = self
-            .suply_limit
+            .supply_limit
             .may_load(deps.storage)?
             .unwrap_or_else(|| 1000u64);
         let total_supply = self
@@ -490,20 +492,24 @@ where
             .reserved_amount
             .may_load(deps.storage)?
             .unwrap_or_else(|| 0u64);
-        let real_purchase = cmp::min(qty.clone(), supply_limit - total_supply);
+        let mut real_purchase = cmp::min(qty.clone(), supply_limit - total_supply);
+        real_purchase = cmp::min(real_purchase.clone(), mint_per_tx);
+        let token_id_base = self
+            .token_id_base
+            .may_load(deps.storage)?
+            .unwrap_or_default();
 
         reserved_amount += real_purchase.clone();
         self.reserved_amount.save(deps.storage, &reserved_amount)?;
 
         let mut msg = Response::new();
-        let mint_response: Response<C> = self.mint(
+        let _mint_response: Response<C> = self.mint(
             deps,
             info.clone(),
-            "jarvis".to_string(),
+            token_id_base,
             qty.clone(),
             extension.clone(),
         )?;
-        // msg.add_message(mint_response);
 
         msg = msg
             .add_attribute("action", "reserve")

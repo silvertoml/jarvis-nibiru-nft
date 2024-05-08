@@ -21,6 +21,15 @@ pub struct InstantiateMsg {
     pub minter: Option<String>,
 
     pub withdraw_address: Option<String>,
+
+    pub mint_per_tx: Option<u64>,
+    pub mint_fee: Option<u64>,
+    pub dev_fee: Option<u64>,
+    pub supply_limit: Option<u64>,
+    pub total_supply: Option<u64>,
+    pub reserved_amount: Option<u64>,
+    pub dev_wallet: Option<String>,
+    pub sale_time: Option<u64>,
 }
 
 /// This is like Cw721ExecuteMsg but we add a Mint command for an owner
