@@ -1,5 +1,5 @@
 {
-  "contract_name": "cw721-base",
+  "contract_name": "cw721-dropspace",
   "contract_version": "0.18.0",
   "idl_version": "1.0.0",
   "instantiate": {
@@ -1007,7 +1007,7 @@
           ],
           "properties": {
             "extension": {
-              "description": "You can add any custom metadata here when you extend cw721-base",
+              "description": "You can add any custom metadata here when you extend cw721-dropspace",
               "allOf": [
                 {
                   "$ref": "#/definitions/Empty"
@@ -1429,7 +1429,7 @@
       ],
       "properties": {
         "extension": {
-          "description": "You can add any custom metadata here when you extend cw721-base",
+          "description": "You can add any custom metadata here when you extend cw721-dropspace",
           "allOf": [
             {
               "$ref": "#/definitions/Empty"

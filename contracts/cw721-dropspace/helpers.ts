@@ -9,7 +9,7 @@ import path from "path";
  * This is a set of helpers meant for use with @cosmjs/cli
  * With these you can easily use the cw721 contract without worrying about forming messages and parsing queries.
  * 
- * Usage: npx @cosmjs/cli@^0.26 --init https://raw.githubusercontent.com/CosmWasm/cosmwasm-plus/master/contracts/cw721-base/helpers.ts
+ * Usage: npx @cosmjs/cli@^0.26 --init https://raw.githubusercontent.com/CosmWasm/cosmwasm-plus/master/contracts/cw721-dropspace/helpers.ts
  * 
  * Create a client:
  *   const [addr, client] = await useOptions(pebblenetOptions).setup('password');
@@ -378,7 +378,7 @@ export const CW721 = (client: SigningCosmWasmClient, fees: Options['fees']): CW7
   }
 
   const upload = async (senderAddress: string): Promise<number> => {
-    const sourceUrl = "https://github.com/CosmWasm/cosmwasm-plus/releases/download/v0.9.0/cw721_base.wasm";
+    const sourceUrl = "https://github.com/CosmWasm/cosmwasm-plus/releases/download/v0.9.0/cw721_dropspace.wasm";
     const wasm = await downloadWasm(sourceUrl);
     const result = await client.upload(senderAddress, wasm, fees.upload);
     return result.codeId;

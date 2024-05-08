@@ -103,7 +103,7 @@
       "type": "object",
       "properties": {
         "extension": {
-          "description": "You can add any custom metadata here when you extend cw721-base",
+          "description": "You can add any custom metadata here when you extend cw721-dropspace",
           "anyOf": [
             {
               "$ref": "#/definitions/Empty"

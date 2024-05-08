@@ -29,7 +29,7 @@ use cosmwasm_std::Empty;
 pub type Extension = Option<Empty>;
 
 // Version info for migration
-pub const CONTRACT_NAME: &str = "crates.io:cw721-base";
+pub const CONTRACT_NAME: &str = "crates.io:cw721-dropspace";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 // currently we only support migrating from 0.16.0. this is ok for now because

@@ -4,7 +4,7 @@ use cw_multi_test::{App, Contract, ContractWrapper, Executor};
 
 use crate::MinterResponse;
 
-fn cw721_base_latest_contract() -> Box<dyn Contract<Empty>> {
+fn cw721_dropspace_latest_contract() -> Box<dyn Contract<Empty>> {
     let contract = ContractWrapper::new(
         crate::entry::execute,
         crate::entry::instantiate,
@@ -14,8 +14,8 @@ fn cw721_base_latest_contract() -> Box<dyn Contract<Empty>> {
     Box::new(contract)
 }
 
-fn cw721_base_016_contract() -> Box<dyn Contract<Empty>> {
-    use cw721_base_016 as v16;
+fn cw721_dropspace_016_contract() -> Box<dyn Contract<Empty>> {
+    use cw721_dropspace_016 as v16;
     let contract = ContractWrapper::new(
         v16::entry::execute,
         v16::entry::instantiate,
@@ -81,12 +81,12 @@ fn mint_transfer_and_burn(app: &mut App, cw721: Addr, sender: Addr, token_id: St
 /// can be minted, transferred, and burnred after migration.
 #[test]
 fn test_migration_016_to_latest() {
-    use cw721_base_016 as v16;
+    use cw721_dropspace_016 as v16;
     let mut app = App::default();
     let admin = || Addr::unchecked("admin");
 
-    let code_id_016 = app.store_code(cw721_base_016_contract());
-    let code_id_latest = app.store_code(cw721_base_latest_contract());
+    let code_id_016 = app.store_code(cw721_dropspace_016_contract());
+    let code_id_latest = app.store_code(cw721_dropspace_latest_contract());
 
     let cw721 = app
         .instantiate_contract(
@@ -98,7 +98,7 @@ fn test_migration_016_to_latest() {
                 minter: admin().into_string(),
             },
             &[],
-            "cw721-base",
+            "cw721-dropspace",
             Some(admin().into_string()),
         )
         .unwrap();
@@ -138,11 +138,11 @@ fn test_migration_016_to_latest() {
 /// This ensures existing 3rd party contracts doesnt need to updated as well.
 #[test]
 fn test_instantiate_016_msg() {
-    use cw721_base_016 as v16;
+    use cw721_dropspace_016 as v16;
     let mut app = App::default();
     let admin = || Addr::unchecked("admin");
 
-    let code_id_latest = app.store_code(cw721_base_latest_contract());
+    let code_id_latest = app.store_code(cw721_dropspace_latest_contract());
 
     let cw721 = app
         .instantiate_contract(
@@ -154,7 +154,7 @@ fn test_instantiate_016_msg() {
                 minter: admin().into_string(),
             },
             &[],
-            "cw721-base",
+            "cw721-dropspace",
             Some(admin().into_string()),
         )
         .unwrap();
