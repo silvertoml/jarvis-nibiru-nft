@@ -3,8 +3,8 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 use cosmwasm_std::{
-    coin, Addr, BankMsg, Binary, Coin, CustomMsg, Deps, DepsMut, Empty, Env, MessageInfo, Response,
-    Storage, SubMsg,
+    coin, Addr, BankMsg, Binary, Coin, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response,
+    Storage
 };
 
 use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
@@ -82,7 +82,11 @@ where
                 owner,
                 token_uri,
                 extension,
-            } => self.mint(deps, info, token_id, 1, extension),
+            } => {
+                let _owner = owner;
+                let _token_uri = token_uri.unwrap_or_else(|| "".into());
+                self.mint(deps, info, token_id, 1, extension)
+            },
             ExecuteMsg::Approve {
                 spender,
                 token_id,
@@ -451,7 +455,7 @@ where
         let remainder = qty.clone() - real_purchase.clone();
 
         let mut msg = Response::new();
-        let mint_response: Response<C> = self.mint(
+        let _mint_response: Response<C> = self.mint(
             deps,
             info.clone(),
             token_id_base,
@@ -462,19 +466,19 @@ where
         let refund_amount =
             sent_funds.clone() - total_fee.clone() as u128 * remainder.clone() as u128;
         if refund_amount > 0 {
-            let send_msg = BankMsg::Send {
+            let _send_msg = BankMsg::Send {
                 to_address: info.sender.into_string(),
                 amount: vec![coin(refund_amount, "unibi")],
             };
         }
-        let mint_fee_send = BankMsg::Send {
+        let _mint_fee_send = BankMsg::Send {
             to_address: withdraw_address.clone().to_string(),
             amount: vec![coin(
                 mint_fee.clone() as u128 * real_purchase.clone() as u128,
                 "unibi",
             )],
         };
-        let dev_fee_send = BankMsg::Send {
+        let _dev_fee_send = BankMsg::Send {
             to_address: dev_wallet.clone().to_string(),
             amount: vec![coin(refund_amount, "unibi")],
         };

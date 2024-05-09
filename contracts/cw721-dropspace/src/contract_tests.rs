@@ -932,7 +932,7 @@ fn test_withdraw_funds() {
 
     // no withdraw address set
     let err = contract
-        .withdraw_funds(deps.as_mut().storage, &Coin::new(100, "uark"))
+        .withdraw_funds(deps.as_mut().storage, &Coin::new(100, "unibi"))
         .unwrap_err();
     assert_eq!(err, ContractError::NoWithdrawAddress {});
 
@@ -941,7 +941,7 @@ fn test_withdraw_funds() {
         .set_withdraw_address(deps.as_mut(), &Addr::unchecked(MINTER), "foo".to_string())
         .unwrap();
     contract
-        .withdraw_funds(deps.as_mut().storage, &Coin::new(100, "uark"))
+        .withdraw_funds(deps.as_mut().storage, &Coin::new(100, "unibi"))
         .unwrap();
 }
 
