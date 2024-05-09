@@ -110,9 +110,16 @@ mod tests {
                 name: "".into(),
                 symbol: "".into(),
                 base_uri: "".into(),
-                token_id_base: "".into,
+                token_id_base: "".into(),
                 minter: Some("other".into()),
                 withdraw_address: None,
+                mint_per_tx: Some(100u64),
+                mint_fee: Some(0u64),
+                dev_fee: Some(0u64),
+                supply_limit: Some(10000u64),
+                reserved_amount: Some(0u64),
+                dev_wallet: None,
+                sale_time: None
             },
         )
         .unwrap();
@@ -145,9 +152,16 @@ mod tests {
                 name: "".into(),
                 symbol: "".into(),
                 base_uri: "".into(),
-                token_id_base: "".into,
-                minter: None,
+                token_id_base: "".into(),
+                minter: Some("other".into()),
                 withdraw_address: None,
+                mint_per_tx: Some(100u64),
+                mint_fee: Some(0u64),
+                dev_fee: Some(0u64),
+                supply_limit: Some(10000u64),
+                reserved_amount: Some(0u64),
+                dev_wallet: None,
+                sale_time: None
             },
         )
         .unwrap();

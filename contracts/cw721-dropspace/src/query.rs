@@ -337,6 +337,10 @@ where
                 let contract_info = self.contract_info.load(deps.storage)?;
                 to_json_binary(&contract_info.symbol)
             },
+            QueryMsg::GetBaseUri {  } => {
+                let base_uri = self.base_uri.load(deps.storage)?;
+                to_json_binary(&base_uri)
+            }
             QueryMsg::GetMintPerTx {  } => {
                 to_json_binary(&self.mint_per_tx.may_load(deps.storage)?)
             },

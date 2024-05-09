@@ -29,7 +29,14 @@ fn setup_contract(deps: DepsMut<'_>) -> Cw721Contract<'static, Extension, Empty,
         base_uri: BASE_URI.to_string(),
         token_id_base: TOKEN_ID_BASE.to_string(),
         minter: Some(String::from(MINTER)),
-        withdraw_address: None,
+        withdraw_address: Some(String::from(MINTER)),
+        mint_per_tx: Some(100u64),
+        mint_fee: Some(0u64),
+        dev_fee: Some(0u64),
+        supply_limit: Some(10000u64),
+        reserved_amount: Some(0u64),
+        dev_wallet: None,
+        sale_time: None
     };
     let info = mock_info("creator", &[]);
     let res = contract.instantiate(deps, mock_env(), info, msg).unwrap();
@@ -49,6 +56,13 @@ fn proper_instantiation() {
         token_id_base: TOKEN_ID_BASE.to_string(),
         minter: Some(String::from(MINTER)),
         withdraw_address: Some(String::from(MINTER)),
+        mint_per_tx: Some(100u64),
+        mint_fee: Some(0u64),
+        dev_fee: Some(0u64),
+        supply_limit: Some(10000u64),
+        reserved_amount: Some(0u64),
+        dev_wallet: None,
+        sale_time: None
     };
     let info = mock_info("creator", &[]);
 

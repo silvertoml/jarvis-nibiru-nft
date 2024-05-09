@@ -26,7 +26,6 @@ pub struct InstantiateMsg {
     pub mint_fee: Option<u64>,
     pub dev_fee: Option<u64>,
     pub supply_limit: Option<u64>,
-    pub total_supply: Option<u64>,
     pub reserved_amount: Option<u64>,
     pub dev_wallet: Option<String>,
     pub sale_time: Option<u64>,
@@ -118,6 +117,10 @@ pub enum ExecuteMsg<T, E> {
 
     SetSymbol {
         symbol: String,
+    },
+
+    SetBaseUri {
+        base_uri: String
     },
 
     SetMintPerTx {
@@ -249,6 +252,9 @@ pub enum QueryMsg<Q: JsonSchema> {
 
     #[returns(String)]
     GetSymbol {},
+
+    #[returns(String)]
+    GetBaseUri {},
 
     #[returns(u64)]
     GetMintPerTx {},

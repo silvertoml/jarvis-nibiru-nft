@@ -40,7 +40,7 @@ where
         let mint_fee = msg.mint_fee.unwrap_or_else(|| 0u64);
         let dev_fee = msg.dev_fee.unwrap_or_else(|| 0u64);
         let supply_limit = msg.supply_limit.unwrap_or_else(|| 100000u64);
-        let total_supply = msg.total_supply.unwrap_or_else(|| 0u64);
+        let total_supply = 0u64;
         let reserved_amount = msg.reserved_amount.unwrap_or_else(|| 0u64);
         let dev_wallet = msg.dev_wallet.unwrap_or_else(|| info.clone().sender.to_string());
         let sale_time = msg.sale_time.unwrap_or_else(|| 0u64);
@@ -90,10 +90,10 @@ where
             } => self.approve(deps, env, info, spender, token_id, expires),
             ExecuteMsg::Revoke { spender, token_id } => {
                 self.revoke(deps, env, info, spender, token_id)
-            }
+            },
             ExecuteMsg::ApproveAll { operator, expires } => {
                 self.approve_all(deps, env, info, operator, expires)
-            }
+            },
             ExecuteMsg::RevokeAll { operator } => self.revoke_all(deps, env, info, operator),
             ExecuteMsg::TransferNft {
                 recipient,
@@ -112,24 +112,25 @@ where
             }
             ExecuteMsg::SetDevWallet { address } => {
                 self.set_dev_wallet(deps, &info.sender, address)
-            }
+            },
             ExecuteMsg::RemoveWithdrawAddress {} => {
                 self.remove_withdraw_address(deps.storage, &info.sender)
-            }
+            },
             ExecuteMsg::WithdrawFunds { amount } => self.withdraw_funds(deps.storage, &amount),
             ExecuteMsg::SetName { name } => self.set_name(deps.storage, &info.sender, &name),
             ExecuteMsg::SetSymbol { symbol } => {
                 self.set_symbol(deps.storage, &info.sender, &symbol)
-            }
+            },
+            ExecuteMsg::SetBaseUri { base_uri } => self.set_base_uri(deps, &info.sender, &base_uri),
             ExecuteMsg::SetMintPerTx { tx } => self.set_mint_per_tx(deps, &info.sender, &tx),
             ExecuteMsg::SetMintFee { fee } => self.set_mint_fee(deps, &info.sender, &fee),
             ExecuteMsg::SetDevFee { fee } => self.set_dev_fee(deps, &info.sender, &fee),
             ExecuteMsg::SetSupplyLimit { supply_limit } => {
                 self.set_supply_limit(deps, &info.sender, &supply_limit)
-            }
+            },
             ExecuteMsg::SetSaleTime { sale_time } => {
                 self.set_sale_time(deps, &info.sender, &sale_time)
-            }
+            },
             ExecuteMsg::Buy { qty, extension } => self.buy(deps, info, &qty, extension),
             ExecuteMsg::Reserve { qty, extension } => self.reserve(deps, info, &qty, extension),
             ExecuteMsg::ToggleSaleActive {} => self.toggle_sale_active(deps, &info.sender),
@@ -313,6 +314,20 @@ where
         Ok(Response::new()
             .add_attribute("action", "set_symbol")
             .add_attribute("symbol", symbol))
+    }
+
+    pub fn set_base_uri(
+        &self,
+        deps: DepsMut,
+        sender: &Addr,
+        base_uri: &String,
+    ) -> Result<Response<C>, ContractError> {
+        cw_ownable::assert_owner(deps.storage, sender)?;
+
+        self.base_uri.save(deps.storage, &base_uri)?;
+        Ok(Response::new()
+            .add_attribute("action", "set_mint_per_tx")
+            .add_attribute("base_uri", base_uri.to_string()))
     }
 
     pub fn set_mint_per_tx(
