@@ -200,18 +200,3 @@ pub fn token_owner_idx<T>(_pk: &[u8], d: &TokenInfo<T>) -> Addr {
     d.owner.clone()
 }
 
-#[derive(Serialize, Deserialize, Debug, JsonSchema)]
-pub struct StatesResponse {
-    pub name: String,
-    pub symbol: String,
-    pub mint_per_tx: u64,
-    pub mint_price: u64,
-    pub mint_fee: u64,
-    pub dev_fee: u64,
-    pub supply_limit: u64,
-    pub total_supply: u64,
-    pub reserved_amount: u64,
-    pub withdraw_address: String,
-    pub dev_wallet: String,
-    pub sale_time: u64,
-}

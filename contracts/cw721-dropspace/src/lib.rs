@@ -109,8 +109,8 @@ mod tests {
             InstantiateMsg {
                 name: "".into(),
                 symbol: "".into(),
-                base_uri: "".into(),
-                token_id_base: "".into(),
+                base_uri: Some("".into()),
+                token_id_base: Some("new".into()),
                 minter: Some("other".into()),
                 withdraw_address: None,
                 mint_per_tx: Some(100u64),
@@ -151,9 +151,9 @@ mod tests {
             InstantiateMsg {
                 name: "".into(),
                 symbol: "".into(),
-                base_uri: "".into(),
-                token_id_base: "".into(),
-                minter: Some("other".into()),
+                base_uri: Some("".into()),
+                token_id_base: Some("".into()),
+                minter: Some("owner".into()),
                 withdraw_address: None,
                 mint_per_tx: Some(100u64),
                 mint_fee: Some(0u64),

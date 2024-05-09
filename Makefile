@@ -1,6 +1,9 @@
 build:
 	cd contracts/cw721-dropspace/ && cargo wasm && cd ../../
 
+test:
+	cargo test
+
 optimize:
 	docker run --rm -v "$$(pwd)":/code \
 		--mount type=volume,source="$$(basename "$$(pwd)")_cache",target=/code/target \

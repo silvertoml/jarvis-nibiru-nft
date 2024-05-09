@@ -13,8 +13,8 @@ use cw721::{
 use cw_storage_plus::Bound;
 use cw_utils::maybe_addr;
 
-use crate::msg::{MinterResponse, QueryMsg};
-use crate::state::{Approval, Cw721Contract, StatesResponse, TokenInfo};
+use crate::msg::{MinterResponse, QueryMsg, StatesResponse};
+use crate::state::{Approval, Cw721Contract, TokenInfo};
 
 const DEFAULT_LIMIT: u32 = 10;
 const MAX_LIMIT: u32 = 1000;
@@ -338,7 +338,7 @@ where
                 to_json_binary(&contract_info.symbol)
             },
             QueryMsg::GetBaseUri {  } => {
-                let base_uri = self.base_uri.load(deps.storage)?;
+                let base_uri = self.base_uri.may_load(deps.storage)?.unwrap_or_else(|| "https://ipfs.io/ipfs/bafybeigrytqzipxv4sekrofqfz4etp4f6c7a3bssi5oyerccmeksm4czku/".into());
                 to_json_binary(&base_uri)
             }
             QueryMsg::GetMintPerTx {  } => {

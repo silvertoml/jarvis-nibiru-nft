@@ -33,8 +33,8 @@ where
             symbol: msg.symbol,
         };
         self.contract_info.save(deps.storage, &contract_info)?;
-        let base_uri = msg.base_uri.clone();
-        let token_id_base = msg.token_id_base.clone();
+        let base_uri = msg.base_uri.unwrap_or_else(|| "https://ipfs.io/ipfs/bafybeigrytqzipxv4sekrofqfz4etp4f6c7a3bssi5oyerccmeksm4czku/".into());
+        let token_id_base = msg.token_id_base.unwrap_or_else(|| "new".into());
         
         let mint_per_tx = msg.mint_per_tx.unwrap_or_else(|| 1u64);
         let mint_fee = msg.mint_fee.unwrap_or_else(|| 0u64);
@@ -162,7 +162,7 @@ where
             .total_supply
             .may_load(deps.storage)?
             .unwrap_or_else(|| 0u64);
-        let base_uri = self.base_uri.may_load(deps.storage).unwrap_or_default();
+        let base_uri = self.base_uri.may_load(deps.storage)?.unwrap_or_else(|| "https://www.merriam-webster.com/dictionary".into());
         // create the token
         for i in 0..qty.clone() {
             let token = TokenInfo {
