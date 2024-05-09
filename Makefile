@@ -1,5 +1,8 @@
 build:
-	cd contracts/cw721-base/ && cargo wasm && cd ../../
+	cd contracts/cw721-dropspace/ && cargo wasm && cd ../../
+
+test:
+	cargo test
 
 optimize:
 	docker run --rm -v "$$(pwd)":/code \
@@ -23,7 +26,7 @@ get-balance:
 	@nibid query bank balances ${WALLET} --denom unibi
 
 upload-testnet:
-	@nibid tx wasm store artifacts/cw721_base.wasm --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes
+	@nibid tx wasm store artifacts/cw721_dropspace.wasm --from ${WALLET} --gas auto --gas-adjustment 1.5 --gas-prices 0.025unibi --yes
 
 instantiate-testnet:
 	$(eval instantiate := $$(shell cat ./commands/instantiate.json))

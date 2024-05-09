@@ -29,7 +29,7 @@ use cosmwasm_std::Empty;
 pub type Extension = Option<Empty>;
 
 // Version info for migration
-pub const CONTRACT_NAME: &str = "crates.io:cw721-base";
+pub const CONTRACT_NAME: &str = "crates.io:cw721-dropspace";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 // currently we only support migrating from 0.16.0. this is ok for now because
@@ -109,10 +109,17 @@ mod tests {
             InstantiateMsg {
                 name: "".into(),
                 symbol: "".into(),
-                base_uri: "".into(),
-                token_id_base: "".into,
+                base_uri: Some("".into()),
+                token_id_base: Some("new".into()),
                 minter: Some("other".into()),
                 withdraw_address: None,
+                mint_per_tx: Some(100u64),
+                mint_fee: Some(0u64),
+                dev_fee: Some(0u64),
+                supply_limit: Some(10000u64),
+                reserved_amount: Some(0u64),
+                dev_wallet: None,
+                sale_time: None
             },
         )
         .unwrap();
@@ -144,10 +151,17 @@ mod tests {
             InstantiateMsg {
                 name: "".into(),
                 symbol: "".into(),
-                base_uri: "".into(),
-                token_id_base: "".into,
-                minter: None,
+                base_uri: Some("".into()),
+                token_id_base: Some("".into()),
+                minter: Some("owner".into()),
                 withdraw_address: None,
+                mint_per_tx: Some(100u64),
+                mint_fee: Some(0u64),
+                dev_fee: Some(0u64),
+                supply_limit: Some(10000u64),
+                reserved_amount: Some(0u64),
+                dev_wallet: None,
+                sale_time: None
             },
         )
         .unwrap();

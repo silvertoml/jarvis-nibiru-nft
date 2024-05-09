@@ -90,8 +90,6 @@ pub trait Cw721Query<T>
 where
     T: Serialize + DeserializeOwned + Clone,
 {
-    // TODO: use custom error?
-    // How to handle the two derived error types?
 
     fn contract_info(&self, deps: Deps) -> StdResult<ContractInfoResponse>;
 

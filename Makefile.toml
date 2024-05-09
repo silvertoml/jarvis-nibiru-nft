@@ -60,7 +60,7 @@ rm -rf contracts/**/schema/raw
 script = """
 crates=(
   cw721
-  cw721-base
+  cw721-dropspace
   cw721-fixed-price
   cw721-metadata-onchain
   cw721-non-transferable

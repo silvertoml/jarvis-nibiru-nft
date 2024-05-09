@@ -1,9 +1,9 @@
-use crate::state::StatesResponse;
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Binary, Coin};
 use cw721::Expiration;
 use cw_ownable::{cw_ownable_execute, cw_ownable_query};
 use schemars::JsonSchema;
+use serde::{Serialize, Deserialize};
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -12,15 +12,21 @@ pub struct InstantiateMsg {
     /// Symbol of the NFT contract
     pub symbol: String,
 
-    pub base_uri: String,
-
-    pub token_id_base: String,
     /// The minter is the only one who can create new NFTs.
     /// This is designed for a base NFT that is controlled by an external program
     /// or contract. You will likely replace this with custom logic in custom NFTs
     pub minter: Option<String>,
-
+    
+    pub base_uri: Option<String>,
+    pub token_id_base: Option<String>,
     pub withdraw_address: Option<String>,
+    pub mint_per_tx: Option<u64>,
+    pub mint_fee: Option<u64>,
+    pub dev_fee: Option<u64>,
+    pub supply_limit: Option<u64>,
+    pub reserved_amount: Option<u64>,
+    pub dev_wallet: Option<String>,
+    pub sale_time: Option<u64>,
 }
 
 /// This is like Cw721ExecuteMsg but we add a Mint command for an owner
@@ -109,6 +115,10 @@ pub enum ExecuteMsg<T, E> {
 
     SetSymbol {
         symbol: String,
+    },
+
+    SetBaseUri {
+        base_uri: String
     },
 
     SetMintPerTx {
@@ -241,6 +251,9 @@ pub enum QueryMsg<Q: JsonSchema> {
     #[returns(String)]
     GetSymbol {},
 
+    #[returns(String)]
+    GetBaseUri {},
+
     #[returns(u64)]
     GetMintPerTx {},
 
@@ -273,4 +286,20 @@ pub enum QueryMsg<Q: JsonSchema> {
 #[cw_serde]
 pub struct MinterResponse {
     pub minter: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, JsonSchema)]
+pub struct StatesResponse {
+    pub name: String,
+    pub symbol: String,
+    pub mint_per_tx: u64,
+    pub mint_price: u64,
+    pub mint_fee: u64,
+    pub dev_fee: u64,
+    pub supply_limit: u64,
+    pub total_supply: u64,
+    pub reserved_amount: u64,
+    pub withdraw_address: String,
+    pub dev_wallet: String,
+    pub sale_time: u64,
 }

@@ -16,7 +16,7 @@ cosmwasm-std    = "^1.2"
 cw2             = "^1.1"
 cw20            = "^1.1"
 cw721           = { version = "*", path = "./packages/cw721" }
-cw721-base      = { version = "*", path = "./contracts/cw721-base" }
+cw721-dropspace      = { version = "*", path = "./contracts/cw721-dropspace" }
 cw721-base-016  = { version = "0.16.0", package = "cw721-base" }
 cw-multi-test   = "^0.20"
 cw-ownable      = "^0.5"
@@ -26,7 +26,7 @@ schemars        = "^0.8"
 serde           = { version = "1.0.152", default-features = false, features = ["derive"] }
 thiserror       = "^1.0"
 
-[profile.release.package.cw721-base]
+[profile.release.package.cw721-dropspace]
 codegen-units = 1
 incremental   = false
 

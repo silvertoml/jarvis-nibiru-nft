@@ -381,7 +381,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cw721-base"
+name = "cw721-dropspace"
 version = "0.18.0"
 dependencies = [
  "cosmwasm-schema",
@@ -392,7 +392,7 @@ dependencies = [
  "cw-utils 1.0.3",
  "cw2 1.1.2",
  "cw721 0.18.0",
- "cw721-base 0.16.0",
+ "cw721-base",
  "schemars",
  "serde",
  "thiserror",

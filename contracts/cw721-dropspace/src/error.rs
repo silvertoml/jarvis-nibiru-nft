@@ -13,6 +13,9 @@ pub enum ContractError {
     #[error(transparent)]
     Version(#[from] cw2::VersionError),
 
+    #[error("this function is blocked")]
+    Blocked {},
+
     #[error("token_id already claimed")]
     Claimed {},
 
