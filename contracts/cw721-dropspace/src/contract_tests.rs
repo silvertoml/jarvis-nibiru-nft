@@ -98,6 +98,240 @@ fn proper_instantiation() {
     assert_eq!(0, tokens.tokens.len());
 }
 
+#[test]
+fn set_get_dev_wallet() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let set_dev_wallet_msg = ExecuteMsg::SetDevWallet { address: "recipient".to_string() };
+
+    // random cannot
+    let random = mock_info("random", &[]);
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, set_dev_wallet_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+    
+    // owner can
+    let owner = mock_info("merlin", &[]);
+
+    contract
+        .execute(deps.as_mut(), mock_env(), owner, set_dev_wallet_msg)
+        .unwrap();
+
+    let res = contract.dev_wallet.may_load(deps.as_ref().storage).unwrap_or_default();
+    assert_eq!(Some("recipient".to_string()), res);
+}
+
+#[test]
+fn set_get_base_uri() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let set_base_uri_msg = ExecuteMsg::SetBaseUri { base_uri: "https://randomUri/".into() };
+
+    // random cannot
+    let random = mock_info("random", &[]);
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, set_base_uri_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+    
+    // owner can
+    let owner = mock_info("merlin", &[]);
+
+    contract
+        .execute(deps.as_mut(), mock_env(), owner, set_base_uri_msg)
+        .unwrap();
+
+    let res = contract.base_uri.may_load(deps.as_ref().storage).unwrap_or_default();
+    assert_eq!(Some("https://randomUri/".into()), res);
+}
+
+#[test]
+fn set_get_mint_per_tx() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let set_mint_per_tx_msg = ExecuteMsg::SetMintPerTx { tx: 100u64 } ;
+
+    // random cannot
+    let random = mock_info("random", &[]);
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, set_mint_per_tx_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+    
+    // owner can
+    let owner = mock_info("merlin", &[]);
+
+    contract
+        .execute(deps.as_mut(), mock_env(), owner, set_mint_per_tx_msg)
+        .unwrap();
+
+    let res = contract.mint_per_tx.may_load(deps.as_ref().storage).unwrap_or_default();
+    assert_eq!(Some(100u64), res);
+}
+
+#[test]
+fn set_get_mint_fee() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let set_mint_fee_msg = ExecuteMsg::SetMintFee { fee: 100u64 } ;
+
+    // random cannot
+    let random = mock_info("random", &[]);
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, set_mint_fee_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+    
+    // owner can
+    let owner = mock_info("merlin", &[]);
+
+    contract
+        .execute(deps.as_mut(), mock_env(), owner, set_mint_fee_msg)
+        .unwrap();
+
+    let res = contract.mint_fee.may_load(deps.as_ref().storage).unwrap_or_default();
+    assert_eq!(Some(100u64), res);
+}
+
+#[test]
+fn set_get_dev_fee() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let set_dev_fee_msg = ExecuteMsg::SetDevFee { fee: 100u64 } ;
+
+    // random cannot
+    let random = mock_info("random", &[]);
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, set_dev_fee_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+    
+    // owner can
+    let owner = mock_info("merlin", &[]);
+
+    contract
+        .execute(deps.as_mut(), mock_env(), owner, set_dev_fee_msg)
+        .unwrap();
+
+    let res = contract.dev_fee.may_load(deps.as_ref().storage).unwrap_or_default();
+    assert_eq!(Some(100u64), res);
+}
+
+#[test]
+fn set_get_supply_limit() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let set_supply_limit_msg = ExecuteMsg::SetSupplyLimit { supply_limit: 10000u64 } ;
+
+    // random cannot
+    let random = mock_info("random", &[]);
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, set_supply_limit_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+    
+    // owner can
+    let owner = mock_info("merlin", &[]);
+
+    contract
+        .execute(deps.as_mut(), mock_env(), owner, set_supply_limit_msg)
+        .unwrap();
+
+    let res = contract.supply_limit.may_load(deps.as_ref().storage).unwrap_or_default();
+    assert_eq!(Some(10000u64), res);
+}
+
+#[test]
+fn set_get_sale_time() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let set_sale_time_msg = ExecuteMsg::SetSaleTime { sale_time: 100u64 } ;
+
+    // random cannot
+    let random = mock_info("random", &[]);
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, set_sale_time_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+    
+    // owner can
+    let owner = mock_info("merlin", &[]);
+
+    contract
+        .execute(deps.as_mut(), mock_env(), owner, set_sale_time_msg)
+        .unwrap();
+
+    let res = contract.sale_time.may_load(deps.as_ref().storage).unwrap_or_default();
+    assert_eq!(Some(100u64), res);
+}
+
+#[test]
+fn set_get_name() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let set_name_msg = ExecuteMsg::SetName { name: "Name".into() } ;
+
+    // random cannot
+    let random = mock_info("random", &[]);
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, set_name_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+    
+    // owner can
+    let owner = mock_info("merlin", &[]);
+
+    contract
+        .execute(deps.as_mut(), mock_env(), owner, set_name_msg)
+        .unwrap();
+
+    let contract_info = contract.contract_info.load(deps.as_ref().storage).unwrap();
+    assert_eq!("Name".to_string(), contract_info.name);
+}
+
+#[test]
+fn set_get_symbol() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let set_symbol_msg = ExecuteMsg::SetSymbol { symbol: "Symbol".into() } ;
+
+    // random cannot
+    let random = mock_info("random", &[]);
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, set_symbol_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+    
+    // owner can
+    let owner = mock_info("merlin", &[]);
+
+    contract
+        .execute(deps.as_mut(), mock_env(), owner, set_symbol_msg)
+        .unwrap();
+
+    let contract_info = contract.contract_info.load(deps.as_ref().storage).unwrap();
+    assert_eq!("Symbol".to_string(), contract_info.symbol);
+}
+
 // #[test]
 // fn minting() {
 //     let mut deps = mock_dependencies();
