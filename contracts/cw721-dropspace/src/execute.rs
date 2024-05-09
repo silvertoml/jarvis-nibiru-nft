@@ -85,7 +85,9 @@ where
             } => {
                 let _owner = owner;
                 let _token_uri = token_uri.unwrap_or_else(|| "".into());
-                self.mint(deps, info, token_id, 1, extension)
+                let _token_id = token_id;
+                let _extension = extension;
+                Err(ContractError::Blocked {  })
             },
             ExecuteMsg::Approve {
                 spender,
@@ -157,7 +159,6 @@ where
         qty: u64,
         extension: T,
     ) -> Result<Response<C>, ContractError> {
-        cw_ownable::assert_owner(deps.storage, &info.clone().sender)?;
         let mut total_supply = self
             .total_supply
             .may_load(deps.storage)?
@@ -453,7 +454,7 @@ where
         let mut real_purchase = cmp::min(qty.clone(), mint_per_tx.unwrap_or_else(|| 1u64));
         real_purchase = cmp::min(real_purchase.clone(), supply_limit - total_supply);
         let remainder = qty.clone() - real_purchase.clone();
-
+        
         let mut msg = Response::new();
         let _mint_response: Response<C> = self.mint(
             deps,
