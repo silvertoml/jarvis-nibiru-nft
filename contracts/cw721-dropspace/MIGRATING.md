@@ -28,6 +28,6 @@ pub struct MinterResponse {
 
 NFTs on version 0.16 may migrate to the new version. For an example of
 doing so, see
-[this](https://github.com/CosmWasm/cw-nfts/blob/zeke/updatable-minter/contracts/cw721-base/src/multi_tests.rs#L83)
+[this](https://github.com/CosmWasm/cw-nfts/blob/zeke/updatable-minter/contracts/cw721-dropspace/src/multi_tests.rs#L83)
 integration test.
 

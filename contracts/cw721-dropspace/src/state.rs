@@ -29,7 +29,7 @@ where
     pub mint_per_tx: Item<'a, u64>,
     pub mint_fee: Item<'a, u64>,
     pub dev_fee: Item<'a, u64>,
-    pub suply_limit: Item<'a, u64>,
+    pub supply_limit: Item<'a, u64>,
     pub total_supply: Item<'a, u64>,
     pub dev_wallet: Item<'a, String>,
     pub sale_time: Item<'a, u64>,
@@ -70,7 +70,7 @@ where
             "mint_per_tx",
             "mint_fee",
             "dev_fee",
-            "suply_limit",
+            "supply_limit",
             "total supply",
             "dev_wallet",
             "sale_time",
@@ -99,7 +99,7 @@ where
         mint_per_tx: &'a str,
         mint_fee: &'a str,
         dev_fee: &'a str,
-        suply_limit: &'a str,
+        supply_limit: &'a str,
         total_supply: &'a str,
         dev_wallet: &'a str,
         sale_time: &'a str,
@@ -121,7 +121,7 @@ where
             mint_per_tx: Item::new(mint_per_tx),
             mint_fee: Item::new(mint_fee),
             dev_fee: Item::new(dev_fee),
-            suply_limit: Item::new(suply_limit),
+            supply_limit: Item::new(supply_limit),
             total_supply: Item::new(total_supply),
             dev_wallet: Item::new(dev_wallet),
             sale_time: Item::new(sale_time),
@@ -161,7 +161,7 @@ pub struct TokenInfo<T> {
     /// Metadata JSON Schema
     pub token_uri: Option<String>,
 
-    /// You can add any custom metadata here when you extend cw721-base
+    /// You can add any custom metadata here when you extend cw721-dropspace
     pub extension: T,
 }
 
@@ -200,18 +200,3 @@ pub fn token_owner_idx<T>(_pk: &[u8], d: &TokenInfo<T>) -> Addr {
     d.owner.clone()
 }
 
-#[derive(Serialize, Deserialize, Debug, JsonSchema)]
-pub struct StatesResponse {
-    pub name: String,
-    pub symbol: String,
-    pub mint_per_tx: u64,
-    pub mint_price: u64,
-    pub mint_fee: u64,
-    pub dev_fee: u64,
-    pub supply_limit: u64,
-    pub total_supply: u64,
-    pub reserved_amount: u64,
-    pub withdraw_address: String,
-    pub dev_wallet: String,
-    pub sale_time: u64,
-}

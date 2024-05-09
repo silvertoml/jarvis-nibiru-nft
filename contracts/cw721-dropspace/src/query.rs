@@ -13,8 +13,8 @@ use cw721::{
 use cw_storage_plus::Bound;
 use cw_utils::maybe_addr;
 
-use crate::msg::{MinterResponse, QueryMsg};
-use crate::state::{Approval, Cw721Contract, StatesResponse, TokenInfo};
+use crate::msg::{MinterResponse, QueryMsg, StatesResponse};
+use crate::state::{Approval, Cw721Contract, TokenInfo};
 
 const DEFAULT_LIMIT: u32 = 10;
 const MAX_LIMIT: u32 = 1000;
@@ -337,6 +337,10 @@ where
                 let contract_info = self.contract_info.load(deps.storage)?;
                 to_json_binary(&contract_info.symbol)
             },
+            QueryMsg::GetBaseUri {  } => {
+                let base_uri = self.base_uri.may_load(deps.storage)?.unwrap_or_else(|| "https://ipfs.io/ipfs/bafybeigrytqzipxv4sekrofqfz4etp4f6c7a3bssi5oyerccmeksm4czku/".into());
+                to_json_binary(&base_uri)
+            }
             QueryMsg::GetMintPerTx {  } => {
                 to_json_binary(&self.mint_per_tx.may_load(deps.storage)?)
             },
@@ -353,7 +357,7 @@ where
                 to_json_binary(&self.mint_fee.may_load(deps.storage)?)
             },
             QueryMsg::GetSupplyLimit {  } => {
-                to_json_binary(&self.suply_limit.may_load(deps.storage)?)
+                to_json_binary(&self.supply_limit.may_load(deps.storage)?)
             },
             QueryMsg::GetTotalSupply {  } => {
                 to_json_binary(&self.total_supply.may_load(deps.storage)?)
@@ -372,7 +376,7 @@ where
                 let mint_per_tx = self.mint_per_tx.may_load(deps.storage)?.unwrap_or_else(|| 1u64);
                 let mint_fee = self.mint_fee.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
                 let dev_fee = self.dev_fee.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
-                let supply_limit = self.suply_limit.may_load(deps.storage)?.unwrap_or_else(|| 100000u64);
+                let supply_limit = self.supply_limit.may_load(deps.storage)?.unwrap_or_else(|| 100000u64);
                 let total_supply = self.total_supply.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
                 let reserved_amount = self.reserved_amount.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
                 let withdraw_address = self.withdraw_address.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());

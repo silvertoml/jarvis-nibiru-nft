@@ -1,5 +1,5 @@
 [package]
-name          = "cw721-base"
+name          = "cw721-dropspace"
 description   = "Basic implementation cw721 NFTs"
 authors       = [
   "Ethan Frey <ethanfrey@users.noreply.github.com>",

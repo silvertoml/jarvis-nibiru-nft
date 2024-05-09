@@ -1,8 +1,8 @@
 {
     "name": "Jarvis NFT",
     "symbol": "JNFT",
-    "base_uri": "",
-    "token_id_base": "",
+    "base_uri": "https://ipfs.io/ipfs/bafybeigrytqzipxv4sekrofqfz4etp4f6c7a3bssi5oyerccmeksm4czku/",
+    "token_id_base": "item",
     "minter": "nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692",
     "withdraw_address": "nibi10rdtquh3jl44hg00x0plzeawuclqqet0he4692"
 }
