@@ -368,6 +368,11 @@ where
             QueryMsg::GetSaleTime {  } => {
                 to_json_binary(&self.sale_time.may_load(deps.storage)?)
             },
+            QueryMsg::GetSaleStatus {  } => {
+                let sale_time = self.sale_time.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let sale_status = sale_time <= env.block.time.seconds();
+                to_json_binary(&sale_status)
+            },
             QueryMsg::GetStates {  } => {
                 let contract_info = self.contract_info.may_load(deps.storage)?.unwrap_or_else(|| ContractInfoResponse{
                     name: "None".to_string(),

@@ -164,6 +164,10 @@ get_sale_time:
 	$(eval GET_NFT_CONTRACT_ADDRESS := $$(shell cat ./commands/get_sale_time.json))
 	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_sale_time)'
 
+get_sale_status:
+	$(eval GET_NFT_CONTRACT_ADDRESS := $$(shell cat ./commands/get_sale_status.json))
+	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_sale_status)'
+
 get_supply_limit:
 	$(eval get_supply_limit := $$(shell cat ./commands/get_supply_limit.json))
 	@nibid query wasm contract-state smart ${NFT_CONTRACT} '$(get_supply_limit)'

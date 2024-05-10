@@ -275,6 +275,9 @@ pub enum QueryMsg<Q: JsonSchema> {
     #[returns(u64)]
     GetSaleTime {},
 
+    #[returns(bool)]
+    GetSaleStatus {},
+
     #[returns(u64)]
     GetReservedAmount {},
 
