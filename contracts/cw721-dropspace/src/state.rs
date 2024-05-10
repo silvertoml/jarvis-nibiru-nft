@@ -23,7 +23,6 @@ where
     pub operators: Map<'a, (&'a Addr, &'a Addr), Expiration>,
     pub tokens: IndexedMap<'a, &'a str, TokenInfo<T>, TokenIndexes<'a, T>>,
     pub withdraw_address: Item<'a, String>,
-    pub sale_active: Item<'a, bool>,
 
     pub reserved_amount: Item<'a, u64>,
     pub mint_per_tx: Item<'a, u64>,
@@ -65,7 +64,6 @@ where
             "tokens",
             "tokens_owner",
             "withdraw_address",
-            "sale_active",
             "reserved_amount",
             "mint_per_tx",
             "mint_fee",
@@ -93,7 +91,6 @@ where
         tokens_key: &'a str,
         tokens_owner_key: &'a str,
         withdraw_address_key: &'a str,
-        sale_active: &'a str,
 
         reserved_amount: &'a str,
         mint_per_tx: &'a str,
@@ -115,7 +112,6 @@ where
             operators: Map::new(operator_key),
             tokens: IndexedMap::new(tokens_key, indexes),
             withdraw_address: Item::new(withdraw_address_key),
-            sale_active: Item::new(sale_active),
 
             reserved_amount: Item::new(reserved_amount),
             mint_per_tx: Item::new(mint_per_tx),

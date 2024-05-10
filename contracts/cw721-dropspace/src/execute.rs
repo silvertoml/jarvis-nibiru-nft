@@ -43,7 +43,7 @@ where
         let total_supply = 0u64;
         let reserved_amount = msg.reserved_amount.unwrap_or_else(|| 0u64);
         let dev_wallet = msg.dev_wallet.unwrap_or_else(|| info.clone().sender.to_string());
-        let sale_time = msg.sale_time.unwrap_or_else(|| 0u64);
+        let sale_time = msg.sale_time.unwrap_or_else(|| std::u64::MAX);
 
         self.mint_per_tx.save(deps.storage, &mint_per_tx)?;
         self.mint_fee.save(deps.storage, &mint_fee)?;
@@ -137,9 +137,9 @@ where
             ExecuteMsg::SetSaleTime { sale_time } => {
                 self.set_sale_time(deps, &info.sender, &sale_time)
             },
-            ExecuteMsg::Buy { qty, extension } => self.buy(deps, info, &qty, extension),
+            ExecuteMsg::Buy { qty, extension } => self.buy(deps, env, info, &qty, extension),
             ExecuteMsg::Reserve { qty, extension } => self.reserve(deps, info, &qty, extension),
-            ExecuteMsg::ToggleSaleActive {} => self.toggle_sale_active(deps, &info.sender),
+            ExecuteMsg::ToggleSaleActive {} => self.toggle_sale_active(deps, env, &info.sender),
         }
     }
 }
@@ -408,12 +408,14 @@ where
     pub fn buy(
         &self,
         deps: DepsMut,
+        env: Env,
         info: MessageInfo,
         qty: &u64,
         extension: T,
     ) -> Result<Response<C>, ContractError> {
-        let sale_active = self.sale_active.may_load(deps.storage)?;
-        if sale_active.unwrap_or_else(|| false) == false {
+        let sale_time = self.sale_time.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+        let sale_active = sale_time <= env.block.time.seconds();
+        if sale_active == false {
             return Err(ContractError::SaleUnactivate {});
         }
 
@@ -540,17 +542,24 @@ where
     pub fn toggle_sale_active(
         &self,
         deps: DepsMut,
+        env: Env,
         sender: &Addr,
     ) -> Result<Response<C>, ContractError> {
         cw_ownable::assert_owner(deps.storage, sender)?;
 
-        let sale_active = self.sale_active.may_load(deps.storage)?;
-        let new_sale_active = !sale_active.unwrap_or_else(|| false);
-        self.sale_active.save(deps.storage, &new_sale_active)?;
-
-        Ok(Response::new()
-            .add_attribute("action", "toggle_sale_active")
-            .add_attribute("sale_active", new_sale_active.to_string()))
+        let sale_time = self.sale_time.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+        if sale_time.clone() <= env.block.time.seconds() {
+            self.sale_time.save(deps.storage, &std::u64::MAX)?;
+            Ok(Response::new()
+                .add_attribute("action", "toggle_sale_active")
+                .add_attribute("sale_active", false.to_string()))
+        }
+        else {
+            self.sale_time.save(deps.storage, &0u64)?;
+            Ok(Response::new()
+                .add_attribute("action", "toggle_sale_active")
+                .add_attribute("sale_active", true.to_string()))
+        }
     }
 }
 
