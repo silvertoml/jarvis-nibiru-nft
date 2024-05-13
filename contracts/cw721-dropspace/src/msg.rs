@@ -304,5 +304,6 @@ pub struct StatesResponse {
     pub reserved_amount: u64,
     pub withdraw_address: String,
     pub dev_wallet: String,
+    pub base_uri: String,
     pub sale_time: u64,
 }

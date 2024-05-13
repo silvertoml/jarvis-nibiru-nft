@@ -387,6 +387,7 @@ where
                 let withdraw_address = self.withdraw_address.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
                 let dev_wallet = self.dev_wallet.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
                 let sale_time = self.sale_time.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let base_uri = self.base_uri.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
 
                 let state = StatesResponse{
                     name: contract_info.name,
@@ -400,7 +401,8 @@ where
                     reserved_amount,
                     withdraw_address,
                     dev_wallet,
-                    sale_time
+                    sale_time,
+                    base_uri
                 };
                 to_json_binary(&state)
             }
