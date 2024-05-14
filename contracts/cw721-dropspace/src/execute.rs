@@ -463,7 +463,6 @@ where
             .unwrap_or_else(|| 0u64);
         let mut real_purchase = cmp::min(qty.clone(), mint_per_tx.unwrap_or_else(|| 1u64));
         real_purchase = cmp::min(real_purchase.clone(), supply_limit - total_supply);
-        let remainder = qty.clone() - real_purchase.clone();
 
         let mut msg = Response::new();
         let _mint_response: Response<C> = self.mint(
@@ -475,7 +474,7 @@ where
         )?;
         // msg.add_message(mint_response);
         let refund_amount =
-            sent_funds.clone() - total_fee.clone() as u128 * remainder.clone() as u128;
+            sent_funds.clone() - total_fee.clone() as u128 * real_purchase.clone() as u128;
         if refund_amount > 0 {
             let _send_msg = BankMsg::Send {
                 to_address: info.sender.into_string(),
