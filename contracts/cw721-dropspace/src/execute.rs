@@ -481,21 +481,24 @@ where
                 amount: vec![coin(refund_amount, "unibi")],
             };
         }
-        let _mint_fee_send = BankMsg::Send {
-            to_address: withdraw_address.clone().to_string(),
-            amount: vec![coin(
-                mint_fee.clone() as u128 * real_purchase.clone() as u128,
-                "unibi",
-            )],
-        };
-        let _dev_fee_send = BankMsg::Send {
-            to_address: dev_wallet.clone().to_string(),
-            amount: vec![coin(
-                dev_fee.clone() as u128 * real_purchase.clone() as u128,
-                "unibi",
-            )],
-        };
-
+        if mint_fee.clone() > 0 {
+            let _mint_fee_send = BankMsg::Send {
+                to_address: withdraw_address.clone().to_string(),
+                amount: vec![coin(
+                    mint_fee.clone() as u128 * real_purchase.clone() as u128,
+                    "unibi",
+                )],
+            };
+        }
+        if dev_fee.clone() > 0 {
+            let _dev_fee_send = BankMsg::Send {
+                to_address: dev_wallet.clone().to_string(),
+                amount: vec![coin(
+                    dev_fee.clone() as u128 * real_purchase.clone() as u128,
+                    "unibi",
+                )],
+            };
+        }
         msg = msg.add_attribute("action", "buy");
         Ok(msg)
     }
