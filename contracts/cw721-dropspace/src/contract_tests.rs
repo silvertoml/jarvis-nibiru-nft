@@ -336,7 +336,7 @@ fn test_buy() {
     let mut deps = mock_dependencies();
     let contract = setup_contract(deps.as_mut());
     
-    let owner = mock_info("merlin", &[]);
+    let owner: cosmwasm_std::MessageInfo = mock_info("merlin", &[]);
     let random = mock_info("random", &[]);
     let random2 = mock_info("random2", &[coin(100, "unibi")]);
     let random3 = mock_info("random3", &[coin(200, "unibi")]);
@@ -351,7 +351,7 @@ fn test_buy() {
     // attempt without funds, in case 0 mint_fee + 0 dev_fee
     contract
         .execute(deps.as_mut(), mock_env(), random.clone(), buy_msg.clone())
-        .unwrap();
+        .unwrap_err();    
 
     // set mint fee to 100 unibi
     let set_mint_fee_msg = ExecuteMsg::SetMintFee { fee: 100u64 };

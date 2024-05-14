@@ -4,7 +4,7 @@ use serde::Serialize;
 
 use cosmwasm_std::{
     coin, Addr, BankMsg, Binary, Coin, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response,
-    Storage
+    Storage,
 };
 
 use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
@@ -33,16 +33,18 @@ where
             symbol: msg.symbol,
         };
         self.contract_info.save(deps.storage, &contract_info)?;
-        let base_uri = msg.base_uri.unwrap_or_else(|| "https://ipfs.io/ipfs/bafybeigrytqzipxv4sekrofqfz4etp4f6c7a3bssi5oyerccmeksm4czku/".into());
-        let token_id_base = msg.token_id_base.unwrap_or_else(|| "new".into());
-        
+        let base_uri = msg.base_uri.unwrap_or_else(|| "".into());
+        let token_id_base = msg.token_id_base.unwrap_or_else(|| "".into());
+
         let mint_per_tx = msg.mint_per_tx.unwrap_or_else(|| 1u64);
         let mint_fee = msg.mint_fee.unwrap_or_else(|| 0u64);
         let dev_fee = msg.dev_fee.unwrap_or_else(|| 0u64);
         let supply_limit = msg.supply_limit.unwrap_or_else(|| 100000u64);
         let total_supply = 0u64;
         let reserved_amount = msg.reserved_amount.unwrap_or_else(|| 0u64);
-        let dev_wallet = msg.dev_wallet.unwrap_or_else(|| info.clone().sender.to_string());
+        let dev_wallet = msg
+            .dev_wallet
+            .unwrap_or_else(|| info.clone().sender.to_string());
         let sale_time = msg.sale_time.unwrap_or_else(|| std::u64::MAX);
 
         self.mint_per_tx.save(deps.storage, &mint_per_tx)?;
@@ -87,8 +89,8 @@ where
                 let _token_uri = token_uri.unwrap_or_else(|| "".into());
                 let _token_id = token_id;
                 let _extension = extension;
-                Err(ContractError::Blocked {  })
-            },
+                Err(ContractError::Blocked {})
+            }
             ExecuteMsg::Approve {
                 spender,
                 token_id,
@@ -96,10 +98,10 @@ where
             } => self.approve(deps, env, info, spender, token_id, expires),
             ExecuteMsg::Revoke { spender, token_id } => {
                 self.revoke(deps, env, info, spender, token_id)
-            },
+            }
             ExecuteMsg::ApproveAll { operator, expires } => {
                 self.approve_all(deps, env, info, operator, expires)
-            },
+            }
             ExecuteMsg::RevokeAll { operator } => self.revoke_all(deps, env, info, operator),
             ExecuteMsg::TransferNft {
                 recipient,
@@ -118,25 +120,25 @@ where
             }
             ExecuteMsg::SetDevWallet { address } => {
                 self.set_dev_wallet(deps, &info.sender, address)
-            },
+            }
             ExecuteMsg::RemoveWithdrawAddress {} => {
                 self.remove_withdraw_address(deps.storage, &info.sender)
-            },
+            }
             ExecuteMsg::WithdrawFunds { amount } => self.withdraw_funds(deps.storage, &amount),
             ExecuteMsg::SetName { name } => self.set_name(deps.storage, &info.sender, &name),
             ExecuteMsg::SetSymbol { symbol } => {
                 self.set_symbol(deps.storage, &info.sender, &symbol)
-            },
+            }
             ExecuteMsg::SetBaseUri { base_uri } => self.set_base_uri(deps, &info.sender, &base_uri),
             ExecuteMsg::SetMintPerTx { tx } => self.set_mint_per_tx(deps, &info.sender, &tx),
             ExecuteMsg::SetMintFee { fee } => self.set_mint_fee(deps, &info.sender, &fee),
             ExecuteMsg::SetDevFee { fee } => self.set_dev_fee(deps, &info.sender, &fee),
             ExecuteMsg::SetSupplyLimit { supply_limit } => {
                 self.set_supply_limit(deps, &info.sender, &supply_limit)
-            },
+            }
             ExecuteMsg::SetSaleTime { sale_time } => {
                 self.set_sale_time(deps, &info.sender, &sale_time)
-            },
+            }
             ExecuteMsg::Buy { qty, extension } => self.buy(deps, env, info, &qty, extension),
             ExecuteMsg::Reserve { qty, extension } => self.reserve(deps, info, &qty, extension),
             ExecuteMsg::ToggleSaleActive {} => self.toggle_sale_active(deps, env, &info.sender),
@@ -163,7 +165,10 @@ where
             .total_supply
             .may_load(deps.storage)?
             .unwrap_or_else(|| 0u64);
-        let base_uri = self.base_uri.may_load(deps.storage)?.unwrap_or_else(|| "https://www.merriam-webster.com/dictionary".into());
+        let base_uri = self
+            .base_uri
+            .may_load(deps.storage)?
+            .unwrap_or_else(|| "".into());
         // create the token
         for i in 0..qty.clone() {
             let token = TokenInfo {
@@ -413,7 +418,10 @@ where
         qty: &u64,
         extension: T,
     ) -> Result<Response<C>, ContractError> {
-        let sale_time = self.sale_time.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+        let sale_time = self
+            .sale_time
+            .may_load(deps.storage)?
+            .unwrap_or_else(|| 0u64);
         let sale_active = sale_time <= env.block.time.seconds();
         if sale_active == false {
             return Err(ContractError::SaleUnactivate {});
@@ -456,7 +464,7 @@ where
         let mut real_purchase = cmp::min(qty.clone(), mint_per_tx.unwrap_or_else(|| 1u64));
         real_purchase = cmp::min(real_purchase.clone(), supply_limit - total_supply);
         let remainder = qty.clone() - real_purchase.clone();
-        
+
         let mut msg = Response::new();
         let _mint_response: Response<C> = self.mint(
             deps,
@@ -483,7 +491,10 @@ where
         };
         let _dev_fee_send = BankMsg::Send {
             to_address: dev_wallet.clone().to_string(),
-            amount: vec![coin(refund_amount, "unibi")],
+            amount: vec![coin(
+                dev_fee.clone() as u128 * real_purchase.clone() as u128,
+                "unibi",
+            )],
         };
 
         msg = msg.add_attribute("action", "buy");
@@ -499,7 +510,10 @@ where
     ) -> Result<Response<C>, ContractError> {
         cw_ownable::assert_owner(deps.storage, &info.clone().sender)?;
 
-        let mint_per_tx = self.mint_per_tx.may_load(deps.storage)?.unwrap_or_else(|| 1000u64);
+        let mint_per_tx = self
+            .mint_per_tx
+            .may_load(deps.storage)?
+            .unwrap_or_else(|| 1000u64);
 
         let supply_limit = self
             .supply_limit
@@ -547,14 +561,16 @@ where
     ) -> Result<Response<C>, ContractError> {
         cw_ownable::assert_owner(deps.storage, sender)?;
 
-        let sale_time = self.sale_time.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+        let sale_time = self
+            .sale_time
+            .may_load(deps.storage)?
+            .unwrap_or_else(|| 0u64);
         if sale_time.clone() <= env.block.time.seconds() {
             self.sale_time.save(deps.storage, &std::u64::MAX)?;
             Ok(Response::new()
                 .add_attribute("action", "toggle_sale_active")
                 .add_attribute("sale_active", false.to_string()))
-        }
-        else {
+        } else {
             self.sale_time.save(deps.storage, &0u64)?;
             Ok(Response::new()
                 .add_attribute("action", "toggle_sale_active")
