@@ -387,11 +387,13 @@ where
                 let withdraw_address = self.withdraw_address.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
                 let dev_wallet = self.dev_wallet.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
                 let sale_time = self.sale_time.may_load(deps.storage)?.unwrap_or_else(|| 0u64);
+                let base_uri = self.base_uri.may_load(deps.storage)?.unwrap_or_else(|| "None".to_string());
+                let sale_active = sale_time <= env.block.time.seconds();
 
                 let state = StatesResponse{
                     name: contract_info.name,
                     symbol: contract_info.symbol,
-                    mint_price: mint_per_tx.clone() + dev_fee.clone(),
+                    mint_price: mint_fee.clone() + dev_fee.clone(),
                     mint_per_tx,
                     mint_fee,
                     dev_fee,
@@ -400,7 +402,9 @@ where
                     reserved_amount,
                     withdraw_address,
                     dev_wallet,
-                    sale_time
+                    sale_time,
+                    base_uri,
+                    sale_active
                 };
                 to_json_binary(&state)
             }

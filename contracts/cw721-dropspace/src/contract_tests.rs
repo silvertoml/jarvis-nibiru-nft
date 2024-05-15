@@ -2,23 +2,24 @@
 use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
 
 use cosmwasm_std::{
-    coin, DepsMut, Empty
+    coin, DepsMut, Empty, Addr, from_json, Response
 };
 
 use cw721::{
-    ContractInfoResponse, Cw721Query, 
+    ContractInfoResponse, Cw721Query, OwnerOfResponse
 };
+use cw721_base_016::entry::query;
 use cw_ownable::OwnershipError;
 
 use crate::{
-    ContractError, Cw721Contract, ExecuteMsg, Extension, InstantiateMsg
+    query, ContractError, Cw721Contract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse, QueryMsg
 };
 
 const MINTER: &str = "merlin";
 const CONTRACT_NAME: &str = "Magic Power";
 const SYMBOL: &str = "MGK";
 const BASE_URI: &str = "";
-const TOKEN_ID_BASE: &str = "";
+const TOKEN_ID_BASE: &str = "Magic";
 
 fn setup_contract(deps: DepsMut<'_>) -> Cw721Contract<'static, Extension, Empty, Empty, Empty> {
     let contract = Cw721Contract::default();
@@ -336,7 +337,7 @@ fn test_buy() {
     let mut deps = mock_dependencies();
     let contract = setup_contract(deps.as_mut());
     
-    let owner = mock_info("merlin", &[]);
+    let owner: cosmwasm_std::MessageInfo = mock_info("merlin", &[]);
     let random = mock_info("random", &[]);
     let random2 = mock_info("random2", &[coin(100, "unibi")]);
     let random3 = mock_info("random3", &[coin(200, "unibi")]);
@@ -351,7 +352,7 @@ fn test_buy() {
     // attempt without funds, in case 0 mint_fee + 0 dev_fee
     contract
         .execute(deps.as_mut(), mock_env(), random.clone(), buy_msg.clone())
-        .unwrap();
+        .unwrap_err();    
 
     // set mint fee to 100 unibi
     let set_mint_fee_msg = ExecuteMsg::SetMintFee { fee: 100u64 };
@@ -383,7 +384,7 @@ fn test_buy() {
         .execute(deps.as_mut(), mock_env(), random3.clone(), buy_msg.clone())
         .unwrap_err();
     assert_eq!(err, ContractError::IncorrectFunds {  });
-
+    
     // attempt with 300 unibi, in case 100 mint_fee + 200 dev_fee
     contract
         .execute(deps.as_mut(), mock_env(), random4.clone(), buy_msg.clone())
@@ -406,4 +407,147 @@ fn test_buy() {
     contract
         .execute(deps.as_mut(), mock_env(), random3, buy_msg.clone())
         .unwrap();
+}
+
+#[test]
+fn test_update_ownership() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let reserve_msg = ExecuteMsg::Reserve { qty: 1, extension: None } ;
+
+    // Minter can mint
+    let minter_info = mock_info(MINTER, &[]);
+    let _ = contract
+        .execute(deps.as_mut(), mock_env(), minter_info.clone(), reserve_msg.clone())
+        .unwrap();
+
+    // Update the owner to "random". The new owner should be able to
+    // mint new tokens, the old one should not.
+    contract
+        .execute(
+            deps.as_mut(),
+            mock_env(),
+            minter_info.clone(),
+            ExecuteMsg::UpdateOwnership(cw_ownable::Action::TransferOwnership {
+                new_owner: "random".to_string(),
+                expiry: None,
+            }),
+        )
+        .unwrap();
+
+    // Minter does not change until ownership transfer completes.
+    let minter: MinterResponse = from_json(
+        contract
+            .query(deps.as_ref(), mock_env(), QueryMsg::Minter {})
+            .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(minter.minter, Some(MINTER.to_string()));
+
+    // Pending ownership transfer should be discoverable via query.
+    let ownership: cw_ownable::Ownership<Addr> = from_json(
+        contract
+            .query(deps.as_ref(), mock_env(), QueryMsg::Ownership {})
+            .unwrap(),
+    )
+    .unwrap();
+
+    assert_eq!(
+        ownership,
+        cw_ownable::Ownership::<Addr> {
+            owner: Some(Addr::unchecked(MINTER)),
+            pending_owner: Some(Addr::unchecked("random")),
+            pending_expiry: None,
+        }
+    );
+
+    // Accept the ownership transfer.
+    let random_info = mock_info("random", &[]);
+    contract
+        .execute(
+            deps.as_mut(),
+            mock_env(),
+            random_info.clone(),
+            ExecuteMsg::UpdateOwnership(cw_ownable::Action::AcceptOwnership),
+        )
+        .unwrap();
+
+    // Minter changes after ownership transfer is accepted.
+    let minter: MinterResponse = from_json(
+        contract
+            .query(deps.as_ref(), mock_env(), QueryMsg::Minter {})
+            .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(minter.minter, Some("random".to_string()));
+
+    // Old owner can not mint.
+    let err: ContractError = contract
+        .execute(deps.as_mut(), mock_env(), minter_info, reserve_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+
+    // New owner can mint.
+    let _ = contract
+        .execute(deps.as_mut(), mock_env(), random_info, reserve_msg.clone())
+        .unwrap();
+}
+
+#[test]
+fn transferring_nft() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let reserve_msg = ExecuteMsg::Reserve {
+        qty: 1,
+        extension: None,
+    };
+
+    let minter = mock_info(MINTER, &[]);
+    contract
+        .execute(deps.as_mut(), mock_env(), minter, reserve_msg.clone())
+        .unwrap();
+
+    // random cannot transfer
+    let random = mock_info("random", &[]);
+    let transfer_msg = ExecuteMsg::TransferNft {
+        recipient: String::from("random2"),
+        token_id: "Magic #1".to_string(),
+    };
+
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, transfer_msg)
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+
+    // owner can
+    let owner = mock_info("merlin", &[]);
+    let transfer_msg = ExecuteMsg::TransferNft {
+        recipient: String::from("random"),
+        token_id: "Magic #1".to_string(),
+    };
+
+    let res = contract
+        .execute(deps.as_mut(), mock_env(), owner, transfer_msg)
+        .unwrap();
+
+    assert_eq!(
+        res,
+        Response::new()
+            .add_attribute("action", "transfer_nft")
+            .add_attribute("sender", "merlin")
+            .add_attribute("recipient", "random")
+            .add_attribute("token_id", "Magic #1")
+    );
+    let owner_res = contract
+        .owner_of(deps.as_ref(), mock_env(), "Magic #1".to_string(), true)
+        .unwrap();
+    assert_eq!(
+        owner_res,
+        OwnerOfResponse {
+            owner: String::from("random"),
+            approvals: vec![],
+        }
+    );
 }
