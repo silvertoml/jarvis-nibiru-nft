@@ -393,7 +393,7 @@ where
                 let state = StatesResponse{
                     name: contract_info.name,
                     symbol: contract_info.symbol,
-                    mint_price: mint_per_tx.clone() + dev_fee.clone(),
+                    mint_price: mint_fee.clone() + dev_fee.clone(),
                     mint_per_tx,
                     mint_fee,
                     dev_fee,

@@ -1,1 +1,1 @@
-0c0b7e95a3a76f755231f47f9827094b5983c2ac2b7d93a4bf213f153886f146  /target/wasm32-unknown-unknown/release/cw721_dropspace.wasm
+18ab6649c4e404a1be20612d7b5dae91af1f128b041977c20f35a82736fc97d7  /target/wasm32-unknown-unknown/release/cw721_dropspace.wasm

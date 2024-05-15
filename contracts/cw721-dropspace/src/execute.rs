@@ -4,7 +4,7 @@ use serde::Serialize;
 
 use cosmwasm_std::{
     coin, Addr, BankMsg, Binary, Coin, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response,
-    Storage,
+    Storage
 };
 
 use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
@@ -426,7 +426,6 @@ where
         if sale_active == false {
             return Err(ContractError::SaleUnactivate {});
         }
-
         let sent_funds: u128 = info
             .funds
             .iter()
@@ -463,41 +462,42 @@ where
             .unwrap_or_else(|| 0u64);
         let mut real_purchase = cmp::min(qty.clone(), mint_per_tx.unwrap_or_else(|| 1u64));
         real_purchase = cmp::min(real_purchase.clone(), supply_limit - total_supply);
-
         let mut msg = Response::new();
         let _mint_response: Response<C> = self.mint(
             deps,
             info.clone(),
             token_id_base,
-            qty.clone(),
+            real_purchase.clone(),
             extension.clone(),
         )?;
-        // msg.add_message(mint_response);
         let refund_amount =
             sent_funds.clone() - total_fee.clone() as u128 * real_purchase.clone() as u128;
         if refund_amount > 0 {
-            let _send_msg = BankMsg::Send {
+            let send_msg = BankMsg::Send {
                 to_address: info.sender.into_string(),
                 amount: vec![coin(refund_amount, "unibi")],
             };
+            msg = msg.add_message(send_msg);
         }
         if mint_fee.clone() > 0 {
-            let _mint_fee_send = BankMsg::Send {
+            let mint_fee_send = BankMsg::Send {
                 to_address: withdraw_address.clone().to_string(),
                 amount: vec![coin(
                     mint_fee.clone() as u128 * real_purchase.clone() as u128,
                     "unibi",
                 )],
             };
+            msg = msg.add_message(mint_fee_send);
         }
         if dev_fee.clone() > 0 {
-            let _dev_fee_send = BankMsg::Send {
+            let dev_fee_send = BankMsg::Send {
                 to_address: dev_wallet.clone().to_string(),
                 amount: vec![coin(
                     dev_fee.clone() as u128 * real_purchase.clone() as u128,
                     "unibi",
                 )],
             };
+            msg = msg.add_message(dev_fee_send);
         }
         msg = msg.add_attribute("action", "buy");
         Ok(msg)
